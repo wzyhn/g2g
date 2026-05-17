@@ -5,24 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#f7f4ed" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#141312" media="(prefers-color-scheme: dark)">
-  <meta name="description" content="G2G 挂2过 · Python 期末冲刺刷题站">
+  <meta name="description" content="e2e 小助手 · Python 期末复习 · 选择题 + 编程题 + AI 讲解">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <meta name="googlebot" content="noindex, nofollow">
   <meta name="baiduspider" content="noindex, nofollow">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://wzyhn.github.io/g2g/">
-  <meta property="og:title" content="G2G 挂2过">
-  <meta property="og:description" content="Python 期末冲刺 · 选择题 + 编程题题库 · AI 讲解">
-  <meta property="og:image" content="https://wzyhn.github.io/g2g/assets/favicon-180.png">
+  <meta property="og:url" content="https://apaper.work/">
+  <meta property="og:title" content="e2e 小助手">
+  <meta property="og:description" content="Python 期末复习 · 选择题 + 编程题题库 · AI 讲解">
+  <meta property="og:image" content="https://apaper.work/assets/favicon-180.png">
   <meta property="og:image:width" content="180">
   <meta property="og:image:height" content="180">
   <meta property="og:locale" content="zh_CN">
-  <meta property="og:site_name" content="G2G 挂2过">
+  <meta property="og:site_name" content="e2e 小助手">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="G2G 挂2过">
-  <meta name="twitter:description" content="Python 期末冲刺 · AI 讲解题库">
-  <meta name="twitter:image" content="https://wzyhn.github.io/g2g/assets/favicon-180.png">
-  <title>G2G 挂2过</title>
+  <meta name="twitter:title" content="e2e 小助手">
+  <meta name="twitter:description" content="Python 期末复习 · AI 讲解题库">
+  <meta name="twitter:image" content="https://apaper.work/assets/favicon-180.png">
+  <title>e2e 小助手 · Python 期末</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
@@ -127,7 +127,7 @@
     .topbar-spacer { width: 36px; }
 
     /* Page */
-    .page { padding: 20px 20px 24px; animation: pageEnter 280ms var(--ease); }
+    .page { padding: 20px 20px 88px; animation: pageEnter 280ms var(--ease); }
     @keyframes pageEnter {
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
@@ -454,22 +454,25 @@
     .credits .meta b { color: var(--text-2); font-family: var(--font-serif); }
     .welcome-cta { margin-top: 12px; }
 
-    /* Bottom nav */
+    /* Bottom nav (固定底栏) */
     .nav {
-      position: sticky; bottom: 0;
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
       display: flex; border-top: 1px solid var(--border);
       background: rgba(247, 244, 237, 0.94);
       background: color-mix(in srgb, var(--bg) 94%, transparent);
       backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       padding-bottom: env(safe-area-inset-bottom);
+      z-index: 50;
     }
     .nav button {
       flex: 1; background: transparent; border: none;
       padding: 12px 0 14px;
-      font-size: 11px;
-      color: var(--text-3); letter-spacing: 0.12em;
+      font-size: 12px;
+      color: var(--text-3); letter-spacing: 0.1em;
       cursor: pointer;
       display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-weight: 600;
     }
     .nav button.active { color: var(--text); }
     .nav .ico { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0; }
@@ -706,8 +709,9 @@
        CONFIG ─── 改这里来定制部署参数
        ================================================================= */
     const CONFIG = {
-      title:    "G2G 挂2过",
-      subtitle: "从挂到过",
+      title:    "e2e 小助手",
+      subtitle: "Python 期末",
+      siteUrl:  "https://apaper.work",
       // 关键日期(用 ISO 格式 + 北京时区,无论用户设备时区如何都精准计时)
       examAt:         "2026-05-19T09:00:00+08:00",   // 考试开始
       projectStartAt: "2026-05-18T02:00:00+08:00",   // 项目启动
@@ -979,7 +983,7 @@
 
     function topbar(title, opts = {}) {
       let right = `<span class="topbar-spacer"></span>`;
-      if (opts.reopen) right = `<button class="icon-btn" onclick="reopenPicker()" aria-label="换题" title="重选" style="font-size:22px; line-height:1;">↺</button>`;
+      if (opts.reopen) right = `<button class="icon-btn" onclick="reopenPicker()" aria-label="换题/重选" title="换题" style="width:auto; padding:0 10px; font-size:13px; font-weight:600; gap:4px; display:inline-flex; align-items:center;"><span style="font-size:18px;">↺</span><span>换题</span></button>`;
       else if (!opts.hideRight) right = `<button class="icon-btn" onclick="go('settings')" aria-label="设置">${ICON_SETTINGS}</button>`;
       return `
         <div class="topbar">
@@ -987,7 +991,7 @@
             ? `<button class="icon-btn" onclick="go('${opts.back}')" aria-label="返回">${ICON_BACK}</button>`
             : `<span class="topbar-spacer"></span>`}
           <div class="title">
-            <img class="topbar-logo" src="assets/logo-48.png" alt="G2G" />
+            <img class="topbar-logo" src="assets/logo-48.png" alt="e2e 小助手" />
             <span>${title}</span>
           </div>
           ${right}
@@ -1026,7 +1030,7 @@
       return `
         <div class="welcome">
           <div class="welcome-header">
-            <img class="welcome-logo" src="assets/logo-256.png" alt="G2G" />
+            <img class="welcome-logo" src="assets/logo-256.png" alt="e2e 小助手" />
             <h1>${CONFIG.title}</h1>
             <div class="tag">${CONFIG.subtitle}</div>
           </div>
@@ -1681,22 +1685,30 @@ ${q.options.map((o, i) => `${letters[i]}. ${stripHTML(o)}`).join("\n")}
     }
 
     function openAbout() {
+      const fmt = (iso) => {
+        const d = new Date(iso);
+        return `${d.getFullYear()} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      };
       const html = `
         <div class="ai-menu-overlay" id="about-modal" onclick="if(event.target===this)closeAbout()" role="dialog" aria-modal="true">
           <div class="ai-menu" style="padding-bottom: 24px;">
             <div style="text-align: center; margin-bottom: 18px;">
-              <img src="assets/logo-256.png" alt="G2G" style="width: 80px; height: 80px;" />
-              <div style="font-family: var(--font-serif); font-size: 28px; font-weight: 800; letter-spacing: 0.08em; margin-top: 8px;">G2G</div>
-              <div style="font-size: 13px; color: var(--text-3); letter-spacing: 0.2em; margin-top: 4px; font-weight: 600;">挂2过 · 从挂到过</div>
+              <img src="assets/logo-256.png" alt="e2e 小助手" style="width: 80px; height: 80px;" />
+              <div style="font-family: var(--font-serif); font-size: 28px; font-weight: 800; letter-spacing: 0.08em; margin-top: 8px;">e2e 小助手</div>
+              <div style="font-size: 13px; color: var(--text-3); letter-spacing: 0.2em; margin-top: 4px; font-weight: 600;">Python 期末复习</div>
             </div>
-            <div style="font-size: 14px; line-height: 1.9; color: var(--text-2); padding: 0 4px;">
-              <p style="margin: 0 0 12px;">「挂」→ <b>2</b> → 「过」 —— 从挂科到过线,中间隔着一个数字 2。</p>
-              <p style="margin: 0 0 12px;">拼音 <i>guà 2 guò</i>,首尾 G 开头,所以简称 <b>G2G</b>(也是 <i>Good to Go</i> 的双关)。</p>
-              <p style="margin: 0 0 12px; color: var(--text-3);">一个班的同学考前一周的共同记忆。</p>
+            <div style="font-size: 13px; line-height: 1.95; color: var(--text-2); padding: 0 4px;">
+              <p style="margin: 0 0 8px;"><b>项目启动</b> · ${fmt(CONFIG.projectStartAt)}</p>
+              <p style="margin: 0 0 14px;"><b>考试时间</b> · ${fmt(CONFIG.examAt)}</p>
+              <p style="margin: 0 0 8px; color: var(--text-3); font-size: 12px;">关于命名 —</p>
+              <p style="margin: 0 0 10px;">代号 <b>G2G</b> (挂2过):「挂」→ 2 → 「过」,中间隔着一个数字 2。拼音 <i>guà 2 guò</i>,首尾 G 开头,也是 <i>Good to Go</i> 的双关。</p>
+              <p style="margin: 0 0 10px; color: var(--text-3); font-size: 12px;">一个班的同学考前一周的共同记忆。</p>
+              <p style="margin: 12px 0 8px; padding-top: 12px; border-top: 1px dashed var(--border); color: var(--text-3); font-size: 12px;">⚠ 题库素材版权归学校及原作者所有,本工具仅供本班内部学习。<b>用户上传或外传题库的行为由其自行负责,如被盗用或侵权,工具方不承担任何责任。</b></p>
             </div>
-            <div style="text-align: center; margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-3); line-height: 1.8;">
+            <div style="text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-3); line-height: 1.8;">
               界面由 <b>${CONFIG.aiModel}</b> 生成<br>
-              <a href="${CONFIG.github}" target="_blank" rel="noopener" style="color: var(--text-2); text-decoration: none; border-bottom: 1px dotted var(--border-strong);">GitHub 开源仓库 →</a>
+              <a href="${CONFIG.siteUrl || CONFIG.github}" target="_blank" rel="noopener" style="color: var(--text-2); text-decoration: none; border-bottom: 1px dotted var(--border-strong); margin-right: 12px;">${CONFIG.siteUrl ? CONFIG.siteUrl.replace('https://','') : '主页'} ↗</a>
+              <a href="${CONFIG.github}" target="_blank" rel="noopener" style="color: var(--text-2); text-decoration: none; border-bottom: 1px dotted var(--border-strong);">GitHub ↗</a>
             </div>
             <button class="ma" style="width:100%; margin-top:16px; padding:12px;" onclick="closeAbout()">关闭</button>
           </div>
@@ -2083,8 +2095,8 @@ ${q.options.map((o, i) => `${letters[i]}. ${stripHTML(o)}`).join("\n")}
     document.getElementById('app').innerHTML = `
       <div class="skeleton" aria-busy="true" aria-label="加载中">
         <img src="assets/logo-256.png" alt="" class="sk-logo" />
-        <div class="sk-title">G2G</div>
-        <div class="sk-sub">挂2过 · 从挂到过</div>
+        <div class="sk-title">e2e</div>
+        <div class="sk-sub">小助手 · Python 期末</div>
         <div class="sk-stats">
           <div class="sk-card"></div>
           <div class="sk-card"></div>
