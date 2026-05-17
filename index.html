@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f4ed" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141312" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="G2G 挂2过 · Python 期末冲刺刷题站">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="baiduspider" content="noindex, nofollow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="G2G 挂2过">
+  <meta property="og:description" content="Python 期末冲刺 · 选择题 + 编程题题库 · AI 讲解">
+  <meta property="og:image" content="assets/favicon-180.png">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:site_name" content="G2G 挂2过">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="G2G 挂2过">
+  <meta name="twitter:description" content="Python 期末冲刺 · AI 讲解题库">
+  <meta name="twitter:image" content="assets/favicon-180.png">
+  <title>G2G 挂2过</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
+  <style>
+    /* ============================================================
+       Design Tokens
+       配色:骨白 / 墨黑 / 深苔绿 —— 改这三组就能换主题色
+       ============================================================ */
+    :root {
+      --bg: #f7f4ed;
+      --surface: #fdfbf6;
+      --surface-2: #efeae0;
+      --text: #1a1a1a;
+      --text-2: #6b6b6b;
+      --text-3: #7a7a7a;
+      --border: #e5dfd2;
+      --border-strong: #c9c0ad;
+      --accent: #2d4a3e;
+      --accent-soft: rgba(45, 74, 62, 0.08);
+      --correct: #2d5f3f;
+      --correct-soft: rgba(45, 95, 63, 0.1);
+      --wrong: #8b2c2c;
+      --wrong-soft: rgba(139, 44, 44, 0.08);
+      --warn: #8b6914;
+      --warn-soft: rgba(139, 105, 20, 0.08);
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+      --font-mono: "SF Mono", "JetBrains Mono", Monaco, Consolas, monospace;
+      --font-serif: "Songti SC", "STSong", "Source Han Serif SC", "Noto Serif CJK SC", serif;
+
+      --r-sm: 4px; --r-md: 6px; --r-lg: 10px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    [data-theme="dark"] .topbar { background: rgba(20, 19, 18, 0.92); }
+    [data-theme="dark"] .nav { background: rgba(20, 19, 18, 0.94); }
+    @supports (background: color-mix(in srgb, red, blue)) {
+      [data-theme="dark"] .topbar { background: color-mix(in srgb, var(--bg) 92%, transparent); }
+      [data-theme="dark"] .nav { background: color-mix(in srgb, var(--bg) 94%, transparent); }
+    }
+    [data-theme="dark"] {
+      --bg: #141312;
+      --surface: #1c1b1a;
+      --surface-2: #262422;
+      --text: #ebe7df;
+      --text-2: #a39e93;
+      --text-3: #8a857a;
+      --border: #2d2b28;
+      --border-strong: #3d3a36;
+      --accent: #7ba88d;
+      --accent-soft: rgba(123, 168, 141, 0.12);
+      --correct: #7ba88d;
+      --correct-soft: rgba(123, 168, 141, 0.12);
+      --wrong: #c97474;
+      --wrong-soft: rgba(201, 116, 116, 0.1);
+      --warn: #c9a86a;
+      --warn-soft: rgba(201, 168, 106, 0.1);
+    }
+
+    /* Base */
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: 0.01em;
+      transition: background 200ms var(--ease), color 200ms var(--ease);
+      padding-top: env(safe-area-inset-top);
+    }
+    button { font-family: inherit; color: inherit; }
+    .app { max-width: 480px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; position: relative; padding-bottom: env(safe-area-inset-bottom); }
+
+    /* Top bar */
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(247, 244, 237, 0.92);
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 52px;
+    }
+    .topbar .title { font-family: var(--font-serif); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; display: flex; align-items: center; gap: 8px; }
+    .topbar-logo { width: 24px; height: 24px; flex-shrink: 0; }
+    .welcome-logo { width: 140px; height: 140px; display: block; margin: 0 auto 24px; }
+    .icon-btn {
+      width: 36px; height: 36px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer;
+      color: var(--text-2); padding: 0;
+      border-radius: var(--r-md);
+      transition: color 150ms var(--ease), background 150ms var(--ease);
+    }
+    .icon-btn:active { color: var(--text); background: var(--surface-2); }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .topbar-spacer { width: 36px; }
+
+    /* Page */
+    .page { padding: 20px 20px 24px; animation: pageEnter 280ms var(--ease); }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hero with countdown */
+    .hero { margin: 16px 0 28px; }
+    .hero .label {
+      font-size: 11px; color: var(--text-3);
+      letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .countdown {
+      font-family: var(--font-serif);
+      font-size: 60px; font-weight: 800;
+      margin: 14px 0 8px;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .countdown small {
+      font-size: 24px; color: var(--text-2); font-weight: 600;
+      margin: 0 4px 0 2px; letter-spacing: 0.04em;
+    }
+    .countdown.done { color: var(--wrong); }
+    .hero .greet {
+      font-size: 18px; color: var(--text); font-weight: 600;
+      margin-top: 14px; line-height: 1.5;
+    }
+    .hero .meta-line {
+      font-size: 12px; color: var(--text-3);
+      margin-top: 14px; line-height: 1.7;
+      display: flex; flex-wrap: wrap; gap: 0 14px;
+      letter-spacing: 0.03em;
+    }
+    .hero .meta-line .sep { color: var(--border-strong); }
+    .hero .meta-line b { color: var(--text-2); font-weight: 500; }
+
+    /* Stats */
+    .stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .stat { background: var(--surface); padding: 16px 12px; text-align: center; }
+    .stat .num {
+      font-family: var(--font-serif);
+      font-size: 30px; font-weight: 800;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .stat .lbl { font-size: 11px; color: var(--text-3); margin-top: 6px; letter-spacing: 0.1em; }
+
+    /* Section heading */
+    .section-h {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin: 28px 0 12px;
+    }
+    .section-h .lbl { font-size: 11px; color: var(--text-3); letter-spacing: 0.18em; text-transform: uppercase; }
+    .section-h .count { font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
+
+    /* Chapter cards */
+    .chapters { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .chap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color 150ms var(--ease), transform 100ms var(--ease);
+      text-align: left;
+    }
+    .chap:active { transform: scale(0.985); }
+    .chap .num { font-family: var(--font-serif); font-size: 14px; color: var(--text-3); letter-spacing: 0.06em; }
+    .chap .name { font-size: 17px; font-weight: 700; margin-top: 6px; }
+    .chap .meta {
+      font-size: 11px; color: var(--text-3); margin-top: 8px;
+      display: flex; gap: 6px; align-items: center;
+      letter-spacing: 0.03em;
+    }
+    .chap .meta .dot { width: 3px; height: 3px; background: var(--text-3); border-radius: 50%; }
+    .chap .pb { margin-top: 10px; height: 2px; background: var(--surface-2); border-radius: 1px; overflow: hidden; }
+    .chap .pb > span { display: block; height: 100%; background: var(--accent); transition: width 300ms var(--ease); }
+
+    /* CTA */
+    .cta {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%;
+      background: var(--text); color: var(--bg);
+      border: none; padding: 18px 22px;
+      border-radius: var(--r-md);
+      font-size: 17px; font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: opacity 150ms var(--ease);
+    }
+    .cta:active { opacity: 0.85; }
+    .cta:disabled { opacity: 0.3; cursor: not-allowed; }
+    .cta .arrow { font-family: var(--font-serif); font-size: 18px; }
+
+    /* Quiz */
+    .q-bar {
+      font-size: 11px; color: var(--text-3); letter-spacing: 0.1em;
+      margin-bottom: 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .q-progress { width: 60%; height: 2px; background: var(--surface-2); border-radius: 1px; overflow: hidden; }
+    .q-progress > span { display: block; height: 100%; background: var(--accent); transition: width 200ms var(--ease); }
+    .q-stem {
+      font-size: 17px; line-height: 1.75;
+      margin-bottom: 28px;
+      letter-spacing: 0.01em;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .q-stem code { font-family: var(--font-mono); font-size: 15px; background: var(--surface-2); padding: 1px 6px; border-radius: 3px; }
+
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .opt {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+      cursor: pointer;
+      transition: border-color 120ms var(--ease), background 120ms var(--ease), transform 60ms var(--ease);
+      font-size: 15px; line-height: 1.5;
+      min-height: 52px;
+      text-align: left;
+      width: 100%;
+    }
+    .opt:active:not([disabled]) { transform: scale(0.995); }
+    .opt .letter { font-family: var(--font-serif); font-size: 14px; color: var(--text-3); flex-shrink: 0; padding-top: 1px; min-width: 14px; letter-spacing: 0.04em; }
+    .opt .text { flex: 1; }
+    .opt .text code { font-family: var(--font-mono); font-size: 13px; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+    .opt.selected { border-color: var(--text); background: var(--accent-soft); }
+    .opt.selected .letter { color: var(--text); font-weight: 500; }
+    .opt.correct { border-color: var(--correct); background: var(--correct-soft); }
+    .opt.correct .letter { color: var(--correct); }
+    .opt.wrong { border-color: var(--wrong); background: var(--wrong-soft); }
+    .opt.wrong .letter { color: var(--wrong); }
+    .opt .tag { margin-left: auto; font-size: 11px; color: var(--text-3); letter-spacing: 0.05em; flex-shrink: 0; padding-top: 2px; }
+    .opt.correct .tag { color: var(--correct); }
+    .opt.wrong .tag { color: var(--wrong); }
+
+    /* Verdict */
+    .verdict {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 24px; padding: 12px 14px;
+      border-radius: var(--r-md);
+      font-size: 14px; letter-spacing: 0.03em;
+    }
+    .verdict.ok { background: var(--correct-soft); color: var(--correct); }
+    .verdict.no { background: var(--wrong-soft); color: var(--wrong); }
+    .verdict .mark { font-family: var(--font-serif); font-size: 18px; line-height: 1; }
+
+    /* Explain */
+    .explain {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+    }
+    .explain summary {
+      list-style: none; cursor: pointer;
+      padding: 12px 14px;
+      font-size: 13px; color: var(--text-2);
+      display: flex; align-items: center; justify-content: space-between;
+      letter-spacing: 0.03em;
+    }
+    .explain summary::-webkit-details-marker { display: none; }
+    .explain summary .chev { font-family: var(--font-serif); transition: transform 200ms var(--ease); color: var(--text-3); }
+    .explain[open] summary .chev { transform: rotate(90deg); }
+    .explain-body {
+      padding: 14px;
+      font-size: 14px; line-height: 1.8;
+      border-top: 1px solid var(--border);
+    }
+    .explain-body p { margin: 0 0 10px; }
+    .explain-body p:last-child { margin-bottom: 0; }
+    .explain-body code { font-family: var(--font-mono); font-size: 13px; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+    .confidence {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--text-3);
+      letter-spacing: 0.05em;
+      margin-top: 10px;
+    }
+    .confidence .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--correct); }
+    .confidence.medium .dot { background: var(--warn); }
+    .confidence.low .dot { background: var(--wrong); }
+
+    /* Action row */
+    .actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn {
+      flex: 1; padding: 14px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px;
+      border-radius: var(--r-md);
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: background 120ms var(--ease);
+    }
+    .btn:active { background: var(--surface-2); }
+    .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-primary:active { opacity: 0.85; background: var(--text); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-full { width: 100%; margin-top: 10px; }
+
+    /* Mistakes */
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-3); }
+    .empty .icon { font-family: var(--font-serif); font-size: 32px; margin-bottom: 14px; opacity: 0.5; letter-spacing: 0.1em; }
+    .empty .lbl { font-size: 14px; line-height: 1.7; }
+    .mistake-list { display: flex; flex-direction: column; gap: 8px; }
+    .mistake {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: 12px 14px;
+      text-align: left; width: 100%;
+      transition: border-color 120ms var(--ease);
+    }
+    .mistake .head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: var(--text-3); margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+    .mistake .head .ch { font-family: var(--font-serif); letter-spacing: 0.08em; }
+    .mistake .head .times { color: var(--wrong); }
+    .mistake .stem {
+      font-size: 14px; line-height: 1.55;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Programming question */
+    .prog h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 500; margin: 0 0 4px; letter-spacing: 0.02em; }
+    .prog .score { font-family: var(--font-serif); font-size: 14px; font-variant-numeric: tabular-nums; color: var(--text-2); letter-spacing: 0.05em; }
+    .prog .score.low { color: var(--wrong); }
+    .prog .row { margin: 18px 0; }
+    .prog .row-h { font-size: 11px; color: var(--text-3); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 8px; }
+    .prog .row-body { font-size: 15px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+    .prog .row-body code { font-family: var(--font-mono); font-size: 13px; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+    pre.code {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 12px 14px;
+      font-family: var(--font-mono); font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    /* ============================================================
+       Welcome screen (replaces lock; shows once)
+       ============================================================ */
+    .welcome {
+      min-height: 100vh; min-height: 100dvh; padding: 120px 24px 48px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .welcome-header { text-align: center; margin-bottom: 56px; }
+    .welcome-header h1 {
+      font-family: var(--font-serif); font-size: 64px; font-weight: 800;
+      letter-spacing: 0.1em; margin: 0 0 16px;
+    }
+    .welcome-header .tag {
+      color: var(--text-2); font-size: 15px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .welcome-section { margin-bottom: 28px; }
+    .welcome-h {
+      font-family: var(--font-serif);
+      font-size: 13px; font-weight: 500;
+      color: var(--text-3);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      margin: 0 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; justify-content: space-between;
+    }
+    .welcome-h .ornament { font-family: var(--font-serif); color: var(--border-strong); letter-spacing: 0; }
+    .tips {
+      list-style: none; padding: 0; margin: 0;
+      font-size: 14px; line-height: 1.85; color: var(--text);
+      counter-reset: tip;
+    }
+    .tips li {
+      position: relative; padding-left: 28px;
+      margin-bottom: 12px;
+      counter-increment: tip;
+    }
+    .tips li::before {
+      content: counter(tip, decimal-leading-zero);
+      position: absolute; left: 0; top: 2px;
+      font-family: var(--font-serif);
+      font-size: 12px; color: var(--text-3);
+      letter-spacing: 0.05em;
+    }
+    .tips li b { font-weight: 500; color: var(--text); }
+    .tips li .warn-text { color: var(--warn); }
+    .disclaim {
+      font-size: 13px; line-height: 1.85; color: var(--text-2);
+    }
+    .disclaim p { margin: 0 0 10px; }
+    .disclaim .strong { color: var(--text); font-weight: 500; }
+    .credits {
+      padding: 18px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      background: var(--surface);
+      font-size: 13px; line-height: 1.85;
+    }
+    .credits .ai {
+      font-family: var(--font-serif); font-size: 15px;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .credits .ai b { font-weight: 500; }
+    .credits .meta { font-size: 12px; color: var(--text-3); letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+    .credits .meta b { color: var(--text-2); font-family: var(--font-serif); }
+    .welcome-cta { margin-top: 12px; }
+
+    /* Bottom nav */
+    .nav {
+      position: sticky; bottom: 0;
+      display: flex; border-top: 1px solid var(--border);
+      background: rgba(247, 244, 237, 0.94);
+      background: color-mix(in srgb, var(--bg) 94%, transparent);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav button {
+      flex: 1; background: transparent; border: none;
+      padding: 12px 0 14px;
+      font-size: 11px;
+      color: var(--text-3); letter-spacing: 0.12em;
+      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .nav button.active { color: var(--text); }
+    .nav .ico { font-family: var(--font-serif); font-size: 15px; letter-spacing: 0; }
+
+    /* Settings */
+    .setting-list {
+      display: flex; flex-direction: column; gap: 1px;
+      background: var(--border); border: 1px solid var(--border);
+      border-radius: var(--r-md); overflow: hidden; margin: 14px 0;
+    }
+    .setting-row {
+      background: var(--surface); padding: 14px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px;
+    }
+    .setting-row .lbl-2 { color: var(--text-3); font-size: 12px; margin-top: 2px; letter-spacing: 0.03em; }
+    .toggle {
+      width: 42px; height: 24px; border-radius: 12px;
+      background: var(--border-strong); border: none;
+      position: relative; cursor: pointer; padding: 0;
+      transition: background 200ms var(--ease);
+      flex-shrink: 0;
+    }
+    .toggle::after {
+      content: ""; position: absolute;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--surface); top: 3px; left: 3px;
+      transition: left 200ms var(--ease);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+    .toggle.on { background: var(--accent); }
+    .toggle.on::after { left: 21px; background: var(--bg); }
+
+    /* End screen */
+    .end-hero { text-align: center; margin-top: 48px; }
+    .end-hero h1 { font-family: var(--font-serif); font-size: 28px; font-weight: 500; margin: 0; letter-spacing: 0.04em; }
+    .end-hero .sub { font-size: 14px; color: var(--text-2); margin-top: 10px; line-height: 1.7; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: var(--text); color: var(--bg);
+      padding: 10px 18px; border-radius: var(--r-md);
+      font-size: 13px; letter-spacing: 0.04em;
+      opacity: 0; pointer-events: none;
+      transition: opacity 200ms var(--ease);
+      z-index: 100;
+      max-width: 80%;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ============================================================
+       Animations & Easter Eggs
+       ============================================================ */
+    /* 答题反馈缩放入场 */
+    @keyframes verdictPop {
+      0%   { opacity: 0; transform: scale(0.94); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .verdict { animation: verdictPop 280ms var(--ease) both; }
+    @keyframes markPop {
+      0%   { transform: scale(0); opacity: 0; }
+      55%  { transform: scale(1.25); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .verdict .mark { display: inline-block; animation: markPop 420ms var(--ease) 80ms both; }
+
+    /* 顽疾 boss 题标签 */
+    @keyframes bossPulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.55; }
+    }
+    .boss-flag {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: var(--wrong); font-size: 11px; letter-spacing: 0.06em;
+      animation: bossPulse 1.8s ease-in-out infinite;
+    }
+    .boss-flag::before { content: "⚑"; font-size: 13px; }
+    .mistake.is-boss { position: relative; }
+    .mistake.is-boss::before {
+      content: ""; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 2px;
+      background: var(--wrong);
+      border-radius: var(--r-md) 0 0 var(--r-md);
+    }
+
+    /* 考试期间倒计时颜色与脉冲 */
+    @keyframes phasePulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.72; }
+    }
+    .countdown.during {
+      color: var(--accent);
+      animation: phasePulse 1.6s ease-in-out infinite;
+    }
+    .countdown.after { color: var(--text-2); }
+
+    /* Page footer (home) */
+    .page-footer {
+      margin-top: 36px; padding: 20px 0 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 11px; color: var(--text-3);
+      letter-spacing: 0.05em; line-height: 1.8;
+    }
+    .page-footer a { color: var(--text-2); text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+
+    /* Skeleton loading */
+    .skeleton { padding: 80px 24px 32px; text-align: center; max-width: 480px; margin: 0 auto; }
+    .skeleton .sk-logo { width: 120px; height: 120px; margin: 0 auto 24px; display: block; opacity: 0.85; animation: skp 1.4s ease-in-out infinite; }
+    .skeleton .sk-title { font-family: var(--font-serif); font-size: 48px; font-weight: 800; letter-spacing: 0.1em; margin-bottom: 8px; color: var(--text); }
+    .skeleton .sk-sub { color: var(--text-3); font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 40px; font-weight: 600; }
+    .skeleton .sk-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+    .skeleton .sk-card { background: var(--surface); height: 70px; animation: skp 1.4s ease-in-out infinite; }
+    .skeleton .sk-card:nth-child(2) { animation-delay: 0.15s; }
+    .skeleton .sk-card:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes skp { 0%,100% { opacity: 0.65; } 50% { opacity: 0.95; } }
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton .sk-logo, .skeleton .sk-card { animation: none; }
+    }
+
+    /* 错题快捷按钮 */
+    .mistake-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+    .mistake-actions .ma { flex: 1; padding: 8px 8px; font-size: 12px; border: 1px solid var(--border); background: transparent; border-radius: 6px; color: var(--text-2); cursor: pointer; letter-spacing: 0.03em; font-weight: 600; }
+    .mistake-actions .ma:active { background: var(--surface-2); }
+    .mistake-actions .ma.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .mistake-actions .ma.ok { color: var(--correct); border-color: var(--correct); }
+
+    /* 错题章节筛选 chip */
+    .mfilter { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 16px; }
+    .mfilter-chip { font-size: 12px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--text-2); cursor: pointer; font-weight: 600; }
+    .mfilter-chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+    /* 收藏 ⭐ 按钮 */
+    .star-btn {
+      background: transparent; border: none; cursor: pointer;
+      font-size: 22px; color: var(--text-3); line-height: 1;
+      padding: 4px 8px; transition: color 150ms var(--ease), transform 150ms;
+    }
+    .star-btn[aria-pressed="true"] { color: #d4a942; }
+    .star-btn:active { transform: scale(0.85); }
+
+    /* 选题面板 modal */
+    .picker-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; align-items: flex-end; justify-content: center;
+      z-index: 100; animation: fadein 180ms var(--ease);
+      padding: 0 0 env(safe-area-inset-bottom);
+    }
+    .picker {
+      background: var(--bg); width: 100%; max-width: 480px;
+      border-radius: 16px 16px 0 0;
+      padding: 22px 22px 30px;
+      animation: slideup 220ms var(--ease);
+      max-height: 90vh; overflow-y: auto;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideup { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .picker-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .picker-head .pt { font-family: var(--font-serif); font-size: 18px; font-weight: 700; letter-spacing: 0.05em; }
+    .picker-x { background: transparent; border: none; font-size: 28px; line-height: 1; color: var(--text-3); cursor: pointer; padding: 0 4px; font-weight: 300; }
+    .picker-stat { font-size: 12px; color: var(--text-3); margin-bottom: 22px; letter-spacing: 0.05em; }
+    .picker-row { margin-bottom: 18px; }
+    .prl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600; margin-bottom: 8px; }
+    .pchips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pchip { font-size: 13px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--text-2); cursor: pointer; font-weight: 600; letter-spacing: 0.02em; }
+    .pchip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .picker-go { margin-top: 8px; }
+
+    /* 模拟测试 */
+    .mock-bar {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px; font-size: 13px;
+    }
+    .mock-bar .timer { font-family: var(--font-mono); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 16px; }
+    .mock-bar .timer.warn { color: var(--warn); }
+    .mock-bar .timer.danger { color: var(--wrong); }
+    .mock-result-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: 20px; margin-bottom: 16px;
+    }
+    .mock-result-card .score-big {
+      font-family: var(--font-serif); font-size: 56px; font-weight: 800;
+      line-height: 1; margin-bottom: 8px; font-variant-numeric: tabular-nums;
+    }
+    .mock-result-card .score-big.good { color: var(--correct); }
+    .mock-result-card .score-big.warn { color: var(--warn); }
+    .mock-result-card .score-big.danger { color: var(--wrong); }
+    .mock-result-card .sub { font-size: 13px; color: var(--text-2); }
+
+    /* 搜索 */
+    .search-box {
+      width: 100%; padding: 14px 18px; font-size: 16px;
+      border: 1px solid var(--border); border-radius: var(--r-md);
+      background: var(--surface); color: var(--text);
+      box-sizing: border-box; margin-bottom: 18px;
+      font-family: inherit;
+    }
+    .search-box:focus { outline: none; border-color: var(--text); }
+    .search-result {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 8px;
+      cursor: pointer; text-align: left; width: 100%;
+      transition: border-color 120ms var(--ease);
+    }
+    .search-result:active { border-color: var(--border-strong); }
+    .search-result .meta { font-size: 11px; color: var(--text-3); letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+    .search-result .stem { font-size: 14px; line-height: 1.55; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .search-empty { text-align: center; padding: 40px 20px; color: var(--text-3); font-size: 14px; }
+
+    /* AI 模板菜单 */
+    .ai-menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: flex; align-items: flex-end; justify-content: center; padding: 0 0 env(safe-area-inset-bottom); animation: fadein 180ms var(--ease); }
+    .ai-menu { background: var(--bg); width: 100%; max-width: 480px; border-radius: 16px 16px 0 0; padding: 22px 22px 30px; animation: slideup 220ms var(--ease); }
+    .ai-menu .ai-title { font-family: var(--font-serif); font-size: 16px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 16px; }
+    .ai-menu .ai-opt { display: block; width: 100%; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); margin-bottom: 8px; text-align: left; cursor: pointer; font-family: inherit; }
+    .ai-menu .ai-opt:active { background: var(--surface-2); }
+    .ai-menu .ai-opt .ai-main { font-size: 15px; font-weight: 600; color: var(--text); }
+    .ai-menu .ai-opt .ai-desc { font-size: 12px; color: var(--text-3); margin-top: 4px; letter-spacing: 0.02em; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app"></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* =================================================================
+       CONFIG ─── 改这里来定制部署参数
+       ================================================================= */
+    const CONFIG = {
+      title:    "G2G 挂2过",
+      subtitle: "从挂到过",
+      // 关键日期(用 ISO 格式 + 北京时区,无论用户设备时区如何都精准计时)
+      examAt:         "2026-05-19T09:00:00+08:00",   // 考试开始
+      projectStartAt: "2026-05-18T02:00:00+08:00",   // 项目启动
+      aiModel:        "Claude 4.7 Opus",
+      aiVendor:       "Anthropic",
+      // 部署前在 GitHub 新建公开仓库,把下面 URL 改成你的
+      github:         "https://github.com/wzyhn/g2g",
+    };
+
+    /* =================================================================
+       SAMPLE DATA  ─── 部署时替换为 fetch('data/choice.json') 加载
+       ================================================================= */
+    let DATA = null;
+    async function loadData() {
+      try {
+        const r = await fetch('data/questions.json');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        DATA = await r.json();
+        render();
+      } catch (e) {
+        document.getElementById('app').innerHTML = `
+          <div style="padding: 80px 24px; text-align: center; color: var(--text-2); max-width: 480px; margin: 0 auto;">
+            <div style="font-family: var(--font-serif); font-size: 26px; font-weight: 700; margin-bottom: 14px; letter-spacing: 0.05em;">题库加载失败</div>
+            <div style="font-size: 14px; line-height: 1.7; margin-bottom: 28px;">网不太好,试试切到 4G / Wi-Fi,或长按右上角 ⋯ 刷新页面。<br><span style="font-size: 11px; color: var(--text-3);">${e.message}</span></div>
+            <button class="cta" onclick="loadData()"><span>再试一次</span><span class="arrow">→</span></button>
+          </div>
+        `;
+      }
+    }
+
+    /* =================================================================
+       STATE
+       ================================================================= */
+    function safeRead(key, fallback) {
+      try {
+        const v = localStorage.getItem(key);
+        return v ? JSON.parse(v) : fallback;
+      } catch (e) {
+        try { localStorage.removeItem(key); } catch {}
+        return fallback;
+      }
+    }
+    function safeWrite(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    function makeTodayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    const state = {
+      route: "home",
+      theme: (function(){
+        try { return localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); }
+        catch { return "light"; }
+      })(),
+      agreed: (function(){ try { return localStorage.getItem("agreed") === "1"; } catch { return false; } })(),
+      progress: safeRead("progress", {}),
+      todayCount: safeRead("today", {}),
+      starred: (function(){
+        const v = safeRead("starred", {});
+        if (Array.isArray(v)) {
+          const o = {}; for (const id of v) o[id] = true; return o;
+        }
+        return (v && typeof v === 'object') ? v : {};
+      })(),
+    };
+    const quiz = { type: null, ch: null, pool: [], idx: 0, selected: null, submitted: false, opts: null };
+    const picker = { open: false, type: null, ch: null, count: 'all', order: 'seq', skipMastered: false };
+    const mock = { active: false, pool: [], idx: 0, answers: [], startAt: 0, endAt: 0, finished: false };
+    const search = { query: '', results: [] };
+    const ui = { mistakeFilter: 'all', aiVariant: 'general' };
+
+    function save() {
+      const ok1 = safeWrite("progress", JSON.stringify(state.progress));
+      const ok2 = safeWrite("today", JSON.stringify(state.todayCount));
+      const ok3 = safeWrite("starred", JSON.stringify(state.starred));
+      if (!ok1 || !ok2 || !ok3) toast("存储已满,进度未保存");
+    }
+    function setTheme(t) {
+      state.theme = t;
+      document.documentElement.setAttribute("data-theme", t);
+      safeWrite("theme", t);
+      if (DATA) render();
+    }
+    function go(route) {
+      const prev = state.route;
+      state.route = route;
+      try { history.pushState({ route }, '', '#' + route); } catch {}
+      render();
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+    window.addEventListener('popstate', (e) => {
+      const r = (e.state && e.state.route) || 'home';
+      // 在 mock 进行中按返回 → 先确认
+      if (mock.active && !mock.finished && state.route === 'mock' && r !== 'mock') {
+        if (!confirm("退出会丢失本次测试进度,确定?")) {
+          history.pushState({ route: 'mock' }, '', '#mock');
+          return;
+        }
+        mock.active = false; stopMockTicking();
+      }
+      state.route = r;
+      render();
+    });
+    function toast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toast._tid);
+      toast._tid = setTimeout(() => t.classList.remove("show"), 1800);
+    }
+    function getWrongIds() {
+      return Object.entries(state.progress).filter(([, v]) => v.lastWrong).map(([k]) => k);
+    }
+    function getStarredIds() {
+      return Object.entries(state.starred || {}).filter(([, v]) => v).map(([k]) => k);
+    }
+    function toggleStar(qid) {
+      state.starred = state.starred || {};
+      if (state.starred[qid]) { delete state.starred[qid]; toast("已取消收藏"); }
+      else { state.starred[qid] = true; toast("已收藏 ⭐"); }
+      save();
+      // 局部更新所有该题 ⭐ 按钮的态
+      document.querySelectorAll(`[data-star-id="${qid}"]`).forEach(el => {
+        const on = !!state.starred[qid];
+        el.setAttribute("aria-pressed", on);
+        el.textContent = on ? "★" : "☆";
+      });
+    }
+    function markMastered(qid) {
+      const p = state.progress[qid];
+      if (!p) return;
+      p.lastWrong = false;
+      p.mastered = true;
+      save();
+      toast("已标记掌握");
+      if (state.route === "mistakes") render();
+    }
+    function isMastered(qid) {
+      const p = state.progress[qid];
+      return !!(p && p.mastered);
+    }
+    function getToday() {
+      const raw = state.todayCount[makeTodayKey()];
+      const answered = Number(raw && raw.answered) || 0;
+      const correct = Number(raw && raw.correct) || 0;
+      return { answered, correct };
+    }
+    function bumpToday(correct) {
+      const k = makeTodayKey();
+      const t = getToday();
+      t.answered++; if (correct) t.correct++;
+      state.todayCount[k] = t;
+      save();
+    }
+    function escapeHTML(s) {
+      return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+    function stripHTML(s) { return String(s).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(); }
+
+    /* =================================================================
+       TIMERS  ─── 距考试倒计时 & 项目运行时长
+       ================================================================= */
+    const EXAM_TS    = new Date(CONFIG.examAt).getTime();
+    const PROJECT_TS = new Date(CONFIG.projectStartAt).getTime();
+
+    function formatExamCountdown() {
+      const now = Date.now();
+      const diff = EXAM_TS - now;
+      if (diff > 0) {
+        const totalSec = Math.floor(diff / 1000);
+        const d = Math.floor(totalSec / 86400);
+        const h = Math.floor((totalSec % 86400) / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        if (d > 0) {
+          return { html: `${d}<small>天</small> ${String(h).padStart(2,'0')}<small>时</small> ${String(m).padStart(2,'0')}<small>分</small>`, phase: 'before' };
+        }
+        return { html: `${String(h).padStart(2,'0')}<small>时</small> ${String(m).padStart(2,'0')}<small>分</small> ${String(s).padStart(2,'0')}<small>秒</small>`, phase: 'before' };
+      }
+      const elapsed = -diff;
+      if (elapsed < 2 * 3600 * 1000)  return { html: '考试中 · 稳住 ✊',  phase: 'during' };
+      if (elapsed < 24 * 3600 * 1000) return { html: '考完了 · 等成绩',     phase: 'after'  };
+      return { html: '已过 · 江湖再见', phase: 'after' };
+    }
+    function formatProjectRuntime() {
+      const diff = Date.now() - PROJECT_TS;
+      if (diff < 0) return "未启动";
+      const totalSec = Math.floor(diff / 1000);
+      const d = Math.floor(totalSec / 86400);
+      const h = Math.floor((totalSec % 86400) / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      if (d > 0) return `${d}天 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+    function formatExamDateLine(phase) {
+      const d = new Date(CONFIG.examAt);
+      const M = d.getMonth() + 1, D = d.getDate();
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      if (phase === 'during') return `${M}月${D}日 ${hh}:${mm} · 进行中`;
+      if (phase === 'after')  return `${M}月${D}日 · 考试已过`;
+      return `距 ${M}月${D}日 ${hh}:${mm} 考试`;
+    }
+    function tickTimers() {
+      if (state.route !== 'home') return;
+      const elExam = document.getElementById('exam-countdown');
+      const elProj = document.getElementById('project-runtime');
+      if (elExam) {
+        const r = formatExamCountdown();
+        elExam.innerHTML = r.html;
+        elExam.classList.remove('before', 'during', 'after');
+        elExam.classList.add(r.phase);
+      }
+      if (elProj) elProj.textContent = formatProjectRuntime();
+    }
+    let _tickInterval = null;
+    function startTicking() {
+      if (_tickInterval) return;
+      _tickInterval = setInterval(tickTimers, 1000);
+    }
+    function stopTicking() {
+      if (_tickInterval) { clearInterval(_tickInterval); _tickInterval = null; }
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopTicking();
+      else if (state.route === 'home') startTicking();
+    });
+
+    /* =================================================================
+       MOUNT ANIMATIONS  ─── 数字 count-up + 进度条入场
+       ================================================================= */
+    function animateNumber(el) {
+      const target = Number(el.dataset.target) || 0;
+      if (!Number.isFinite(target) || target <= 0) { if (el.firstChild) el.firstChild.nodeValue = '0'; return; }
+      const duration = 700;
+      const t0 = performance.now();
+      function step(t) {
+        const p = Math.min(1, (t - t0) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = Math.round(target * eased);
+        if (el.firstChild) el.firstChild.nodeValue = String(val);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    function animateMountFx() {
+      document.querySelectorAll('.stat .num[data-target]').forEach(animateNumber);
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.chap .pb > span[data-pct]').forEach(el => {
+          const pct = el.dataset.pct;
+          el.style.transition = 'width 700ms cubic-bezier(0.4, 0, 0.2, 1)';
+          el.style.width = pct + '%';
+        });
+      });
+    }
+
+    /* =================================================================
+       SHARED COMPONENTS
+       ================================================================= */
+    const ICON_SETTINGS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+    const ICON_BACK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>`;
+
+    function topbar(title, opts = {}) {
+      return `
+        <div class="topbar">
+          ${opts.back
+            ? `<button class="icon-btn" onclick="go('${opts.back}')" aria-label="返回">${ICON_BACK}</button>`
+            : `<span class="topbar-spacer"></span>`}
+          <div class="title">
+            <img class="topbar-logo" src="assets/logo-48.png" alt="G2G" />
+            <span>${title}</span>
+          </div>
+          ${opts.hideRight
+            ? `<span class="topbar-spacer"></span>`
+            : `<button class="icon-btn" onclick="go('settings')" aria-label="设置">${ICON_SETTINGS}</button>`}
+        </div>`;
+    }
+    function bottomNav(active) {
+      const item = (key, ico, label) => `
+        <button class="${active === key ? 'active' : ''}" onclick="go('${key}')" ${active === key ? 'aria-current="page"' : ''} aria-label="${label}">
+          <span class="ico">${ico}</span><span>${label}</span>
+        </button>`;
+      return `
+        <nav class="nav" role="navigation" aria-label="主导航">
+          ${item('home', '章', '题库')}
+          ${item('mistakes', '误', '错题')}
+          ${item('settings', '设', '设置')}
+        </nav>`;
+    }
+
+    /* =================================================================
+       WELCOME PAGE  ─── 首次进入展示「温馨提示 + 免责声明 + AI 署名」
+       ================================================================= */
+    function welcomePage() {
+      // 已同意用户不应再看到 welcome,直接跳 home
+      if (state.agreed) { state.route = "home"; return homePage(); }
+      return `
+        <div class="welcome">
+          <div class="welcome-header">
+            <img class="welcome-logo" src="assets/logo-256.png" alt="G2G" />
+            <h1>${CONFIG.title}</h1>
+            <div class="tag">${CONFIG.subtitle}</div>
+          </div>
+          <button class="cta welcome-cta" onclick="agreeAndEnter()">
+            <span>进入</span>
+            <span class="arrow">→</span>
+          </button>
+        </div>`;
+    }
+    function agreeAndEnter() {
+      safeWrite("agreed", "1");
+      state.agreed = true;
+      go('home');
+    }
+
+    /* =================================================================
+       HOME PAGE
+       ================================================================= */
+    function homePage() {
+      const today = getToday();
+      const rate = today.answered ? Math.round(today.correct / today.answered * 100) : 0;
+      const wrongCount = getWrongIds().length;
+      const totalChoice = DATA.meta.choiceChapters.reduce((s, c) => s + c.count, 0);
+      const totalCode = DATA.meta.codeChapters.reduce((s, c) => s + c.count, 0);
+      const initial = formatExamCountdown();
+
+      return `
+        ${topbar(CONFIG.title)}
+        <div class="page">
+          <div class="hero">
+            <div class="label">${formatExamDateLine(initial.phase)}</div>
+            <div class="countdown ${initial.phase}" id="exam-countdown">${initial.html}</div>
+            <div class="greet">${greeting(initial.phase)}</div>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><div class="num" data-target="${today.answered}">0</div><div class="lbl">今日</div></div>
+            <div class="stat"><div class="num" data-target="${wrongCount}">0</div><div class="lbl">错题</div></div>
+            <div class="stat"><div class="num" data-target="${rate}">0<span style="font-size:14px; color:var(--text-3);">%</span></div><div class="lbl">正确率</div></div>
+          </div>
+
+          <button class="cta" onclick="${wrongCount ? "startQuiz('wrong')" : ''}" ${wrongCount ? '' : 'disabled'}>
+            <span>${wrongCount ? `刷错题 · ${wrongCount} 题` : '还没有错题'}</span>
+            <span class="arrow">→</span>
+          </button>
+
+          ${(() => {
+            const starN = getStarredIds().length;
+            return `
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
+                <button class="btn" onclick="${starN ? "startQuiz('starred')" : ''}" ${starN ? '' : 'disabled'} style="padding:14px; font-weight:700;">⭐ 收藏 ${starN}</button>
+                <button class="btn" onclick="go('mock')" style="padding:14px; font-weight:700;">模拟测试 30 题</button>
+              </div>
+              <button class="btn" onclick="go('search')" style="margin-top: 10px; padding: 12px; width: 100%; font-weight: 600;">🔍 搜索题目</button>
+            `;
+          })()}
+
+          <div class="section-h">
+            <div class="lbl">选择题</div>
+            <div class="count">${totalChoice} 题</div>
+          </div>
+          <div class="chapters">${DATA.meta.choiceChapters.map(c => chapCard(c, "choice")).join("")}</div>
+
+          <div class="section-h">
+            <div class="lbl">编程题</div>
+            <div class="count">${totalCode} 题</div>
+          </div>
+          <div class="chapters">${DATA.meta.codeChapters.map(c => chapCard(c, "code")).join("")}</div>
+        </div>
+        ${bottomNav('home')}`;
+    }
+
+    function greeting(phase) {
+      if (phase === 'during') return "笔握稳,写完检查两遍。";
+      if (phase === 'after')  return "考完了,睡个好觉。";
+      const hours = (EXAM_TS - Date.now()) / 3600000;
+      if (hours <= 6)  return "深呼吸,稳住。";
+      if (hours <= 24) return "最后冲刺,专注错题。";
+      if (hours <= 72) return "节奏稳住,别堆题。";
+      return "慢慢来,会的。";
+    }
+
+    function chapCard(ch, type) {
+      const list = type === "choice" ? DATA.choice : DATA.code;
+      const ids = list.filter(q => q.ch === ch.id).map(q => q.id);
+      const done = ids.filter(id => state.progress[id]?.answered).length;
+      const pct = ids.length ? Math.round(done / ids.length * 100) : 0;
+      return `
+        <button class="chap" aria-label="${ch.id.toUpperCase()} ${ch.name},共 ${ch.count} 题,已练 ${done} 题" onclick="showPicker('${type}','${ch.id}')">
+          <div class="num" aria-hidden="true">${ch.id.toUpperCase()}</div>
+          <div class="name">${ch.name}</div>
+          <div class="meta" aria-hidden="true">
+            <span>${ch.count} 题</span>
+            ${done ? `<span class="dot"></span><span>已练 ${done}</span>` : ''}
+          </div>
+          <div class="pb" aria-hidden="true"><span data-pct="${pct}" style="width:0"></span></div>
+        </button>`;
+    }
+
+    /* =================================================================
+       QUIZ
+       ================================================================= */
+    function showPicker(type, ch) {
+      picker.open = true;
+      picker.type = type;
+      picker.ch = ch || null;
+      picker.count = 'all';
+      picker.order = 'seq';
+      picker.skipMastered = false;
+      renderPickerOverlay();
+    }
+    function closePicker() {
+      picker.open = false;
+      const el = document.getElementById('picker-overlay');
+      if (el) el.remove();
+    }
+    function applyPicker() {
+      const opts = { count: picker.count, order: picker.order, skipMastered: picker.skipMastered };
+      const type = picker.type, ch = picker.ch;
+      closePicker();
+      startQuiz(type, ch, opts);
+    }
+    function setPickerOpt(key, val) {
+      picker[key] = val;
+      renderPickerOverlay();
+    }
+    function pickerHTML() {
+      const list = picker.type === "choice" ? DATA.choice : (picker.type === "code" ? DATA.code : []);
+      const chMeta = picker.type === "choice"
+        ? (DATA.meta.choiceChapters.find(c => c.id === picker.ch) || {})
+        : (DATA.meta.codeChapters.find(c => c.id === picker.ch) || {});
+      const all = list.filter(q => q.ch === picker.ch);
+      const done = all.filter(q => state.progress[q.id]?.answered).length;
+      const wrong = all.filter(q => state.progress[q.id]?.lastWrong).length;
+      const mastered = all.filter(q => isMastered(q.id)).length;
+      const chip = (key, val, label) =>
+        `<button class="pchip ${picker[key]===val?'on':''}" onclick="setPickerOpt('${key}','${val}')">${label}</button>`;
+      const isCode = picker.type === 'code';
+      return `
+        <div class="picker-overlay" id="picker-overlay" onclick="if(event.target===this)closePicker()" role="dialog" aria-modal="true" aria-label="选题">
+          <div class="picker">
+            <div class="picker-head">
+              <div class="pt">${chMeta.id ? chMeta.id.toUpperCase() : ''} · ${chMeta.name || ''}</div>
+              <button class="picker-x" onclick="closePicker()" aria-label="关闭">×</button>
+            </div>
+            <div class="picker-stat">共 ${all.length} 题 · 已练 ${done} · 错过 ${wrong} · 已掌握 ${mastered}</div>
+            ${isCode ? '' : `
+            <div class="picker-row"><div class="prl">题数</div>
+              <div class="pchips">${chip('count','10','10')}${chip('count','20','20')}${chip('count','30','30')}${chip('count','all','全部')}</div>
+            </div>`}
+            <div class="picker-row"><div class="prl">顺序</div>
+              <div class="pchips">
+                ${chip('order','seq','顺序')}
+                ${chip('order','random','随机')}
+                ${chip('order','wrongFirst','错题优先')}
+                ${chip('order','unseenFirst','未做优先')}
+              </div>
+            </div>
+            <div class="picker-row"><div class="prl">过滤</div>
+              <div class="pchips">
+                <button class="pchip ${picker.skipMastered?'on':''}" onclick="setPickerOpt('skipMastered',${!picker.skipMastered})">跳过已掌握</button>
+              </div>
+            </div>
+            <button class="cta picker-go" onclick="applyPicker()"><span>开始</span><span class="arrow">→</span></button>
+          </div>
+        </div>`;
+    }
+    function renderPickerOverlay() {
+      const old = document.getElementById('picker-overlay');
+      if (old) old.remove();
+      if (!picker.open) return;
+      document.getElementById('app').insertAdjacentHTML('beforeend', pickerHTML());
+    }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function startQuiz(type, ch, opts) {
+      quiz.type = type;
+      quiz.ch = ch || null;
+      quiz.opts = opts || null;
+      let pool = [];
+      if (type === "wrong") {
+        const ids = getWrongIds();
+        pool = DATA.choice.filter(q => ids.includes(q.id));
+      } else if (type === "starred") {
+        const ids = getStarredIds();
+        pool = DATA.choice.filter(q => ids.includes(q.id))
+          .concat(DATA.code.filter(q => ids.includes(q.id)));
+      } else if (type === "choice") {
+        pool = DATA.choice.filter(q => q.ch === ch);
+      } else if (type === "code") {
+        pool = DATA.code.filter(q => q.ch === ch);
+      }
+      // 应用 picker 选项
+      if (opts) {
+        if (opts.skipMastered) {
+          pool = pool.filter(q => !isMastered(q.id));
+        }
+        if (opts.order === "random") pool = shuffle(pool);
+        else if (opts.order === "wrongFirst") {
+          pool.sort((a, b) => {
+            const aw = state.progress[a.id]?.lastWrong ? 1 : 0;
+            const bw = state.progress[b.id]?.lastWrong ? 1 : 0;
+            return bw - aw;
+          });
+        } else if (opts.order === "unseenFirst") {
+          pool.sort((a, b) => {
+            const aDone = state.progress[a.id]?.answered ? 1 : 0;
+            const bDone = state.progress[b.id]?.answered ? 1 : 0;
+            return aDone - bDone;
+          });
+        }
+        if (opts.count && opts.count !== 'all') {
+          const n = Number(opts.count) || pool.length;
+          pool = pool.slice(0, n);
+        }
+      } else if (type === "wrong") {
+        pool = shuffle(pool);
+      }
+      quiz.pool = pool;
+      quiz.idx = 0;
+      quiz.selected = null;
+      quiz.submitted = false;
+      if (!quiz.pool.length) { toast("这一组没有题"); return; }
+      // 收藏池里同时有选择题+编程题,需根据当前题型分发;简化:starred 始终走 quizPage,代码题用 stripHTML 显示
+      const usesCodePage = (type === "code");
+      go(usesCodePage ? "codeq" : "q");
+    }
+
+    function quizPage() {
+      const q = quiz.pool[quiz.idx];
+      // 收藏池或搜索池可能含编程题,自动派发到代码题页
+      if (q && !Array.isArray(q.options) && q.problem !== undefined) {
+        return codeQuizPage();
+      }
+      if (!q) {
+        return `
+          ${topbar("练习", { back: "home", hideRight: true })}
+          <div class="page">
+            <div class="end-hero">
+              <h1>这一轮结束了。</h1>
+              <div class="sub">共练习 ${quiz.pool.length} 题<br>错题已自动收入错题本</div>
+            </div>
+            <button class="cta" onclick="go('home')" style="margin-top:36px;">
+              <span>回首页</span><span class="arrow">→</span>
+            </button>
+          </div>`;
+      }
+
+      const isWrong = quiz.type === "wrong";
+      const chName = (DATA.meta.choiceChapters.find(c => c.id === q.ch) || {}).name || "";
+      const title = isWrong ? "刷错题" : `${q.ch.toUpperCase()} · ${chName}`;
+
+      return `
+        ${topbar(title, { back: "home", hideRight: true })}
+        <div class="page">
+          <div class="q-bar">
+            <span>${quiz.idx + 1} / ${quiz.pool.length}</span>
+            <div class="q-progress"><span style="width:${(quiz.idx + 1) / quiz.pool.length * 100}%"></span></div>
+            <button class="star-btn" data-star-id="${q.id}" aria-label="收藏" aria-pressed="${!!state.starred[q.id]}" onclick="toggleStar('${q.id}')">${state.starred[q.id] ? '★' : '☆'}</button>
+          </div>
+
+          <div class="q-stem">${q.stem}</div>
+
+          <div class="options" role="radiogroup" aria-label="选项">
+            ${q.options.map((opt, i) => optionEl(opt, i, q)).join("")}
+          </div>
+
+          ${quiz.submitted ? feedbackBlock(q) : ""}
+
+          <div class="actions">
+            ${quiz.submitted
+              ? `<button class="btn btn-primary" onclick="nextQ()">${quiz.idx + 1 >= quiz.pool.length ? '完成' : '下一题'}</button>`
+              : `<button class="btn btn-primary" onclick="submitQ()" ${quiz.selected === null ? 'disabled' : ''}>提交</button>`}
+          </div>
+        </div>`;
+    }
+
+    function optionEl(opt, i, q) {
+      let cls = "opt", tag = "";
+      if (quiz.submitted) {
+        if (i === q.answer) { cls += " correct"; tag = "正确"; }
+        else if (i === quiz.selected) { cls += " wrong"; tag = "你选"; }
+      } else if (quiz.selected === i) cls += " selected";
+      const checked = quiz.selected === i ? "true" : "false";
+      return `
+        <button class="${cls}" role="radio" aria-checked="${checked}" onclick="pickOpt(${i})" ${quiz.submitted ? 'disabled' : ''}>
+          <span class="letter" aria-hidden="true">${String.fromCharCode(65 + i)}</span>
+          <span class="text">${opt}</span>
+          ${tag ? `<span class="tag">${tag}</span>` : ''}
+        </button>`;
+    }
+
+    function feedbackBlock(q) {
+      const correct = quiz.selected === q.answer;
+      const conf = q.confidence || "high";
+      const confLabel = { high: "AI 答案 · 高置信", medium: "AI 答案 · 需注意", low: "AI 答案 · 待校对" }[conf];
+      return `
+        <div class="verdict ${correct ? 'ok' : 'no'}">
+          <span class="mark">${correct ? '✓' : '✕'}</span>
+          <span>${correct ? '答对了' : `正确答案是 ${String.fromCharCode(65 + q.answer)}`}</span>
+        </div>
+
+        <details class="explain" ${correct ? '' : 'open'}>
+          <summary><span>讲解 · ${q.topic || ''}</span><span class="chev">›</span></summary>
+          <div class="explain-body">
+            ${q.explanation}
+            <div class="confidence ${conf}"><span class="dot"></span><span>${confLabel}</span></div>
+          </div>
+        </details>
+
+        <button class="btn btn-full" onclick="openAIMenu('${q.id}')">让 AI 讲一讲 · 去豆包/Kimi</button>`;
+    }
+
+    function pickOpt(i) {
+      if (quiz.submitted) return;
+      quiz.selected = i;
+      // 局部更新而不是全量 render(降低 tap 延迟)
+      const opts = document.querySelectorAll('.options .opt');
+      opts.forEach((el, idx) => {
+        el.classList.toggle('selected', idx === i);
+        el.setAttribute('aria-checked', idx === i ? 'true' : 'false');
+      });
+      const submitBtn = document.querySelector('.actions .btn-primary');
+      if (submitBtn) submitBtn.disabled = false;
+    }
+    function submitQ() {
+      if (quiz.selected === null) return;
+      quiz.submitted = true;
+      const q = quiz.pool[quiz.idx];
+      const correct = quiz.selected === q.answer;
+      const p = state.progress[q.id] || { answered: false, correctCount: 0, wrongCount: 0, lastWrong: false };
+      p.answered = true;
+      if (correct) { p.correctCount++; p.lastWrong = false; }
+      else { p.wrongCount++; p.lastWrong = true; }
+      state.progress[q.id] = p;
+      bumpToday(correct);
+      save();
+      if (!correct) toast("已收入错题本");
+      render();
+    }
+    function nextQ() {
+      quiz.idx++;
+      quiz.selected = null;
+      quiz.submitted = false;
+      render();
+    }
+
+    function copyAIPrompt(qid, variant) {
+      variant = variant || 'general';
+      const q = DATA.choice.find(x => x.id === qid);
+      if (!q) return;
+      const letters = ["A", "B", "C", "D"];
+      const requirements = {
+        general: `1. 先一句话说出正确答案是哪个,以及为什么。
+2. 逐个说明 A、B、C、D 四个选项分别对错。
+3. 指出这道题考查的知识点。
+4. 给出 1 个常见易错点或类似题目变体,帮我举一反三。
+5. 全程使用中文,不超过 300 字。
+6. 如果你发现题面或选项有错别字或歧义,直接指出。`,
+        counter: `1. 先一句话说出正确答案。
+2. 对每个错误选项,**举一个具体的反例代码或场景**,展示它为什么不成立。
+3. 强调那个最容易让人误选的陷阱选项。
+4. 中文,不超过 350 字。`,
+        compare: `1. 先一句话说出正确答案。
+2. 列出 1-3 道**与本题考点相似但答案不同**的对比题(可虚构),分别给出题面和答案差异。
+3. 总结这类题的判别要点。
+4. 中文,不超过 400 字。`,
+        brief: `用**严格的 5 句话**回答:
+1) 正确答案是 X。
+2) 因为 ……
+3) 选项 A 错在 ……(对 A 选项处理,其他选项类似简短)。
+4) 考点是 ……。
+5) 易错点是 ……。
+中文,每句尽量短。`,
+      };
+      const text = `你是一位耐心的 Python 老师,正在帮我准备《Python 程序设计》期末考试。
+请用通俗的中文,给我讲解下面这道选择题。要求:
+${requirements[variant]}
+
+---
+题目:
+${stripHTML(q.stem)}
+
+选项:
+${q.options.map((o, i) => `${letters[i]}. ${stripHTML(o)}`).join("\n")}
+
+参考答案(可能有误,请独立判断):${letters[q.answer]}
+
+请开始讲解。`;
+
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(
+          () => toast("已复制 · 粘贴到豆包/Kimi"),
+          () => fallbackCopy(text)
+        );
+      } else fallbackCopy(text);
+    }
+    function fallbackCopy(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.cssText = "position:fixed;top:30%;left:5%;width:90%;height:200px;z-index:1000;font-size:13px;padding:10px;";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); toast("已复制"); }
+      catch { toast("请长按上方文本手动复制"); }
+      setTimeout(() => ta.remove(), 200);
+    }
+
+    function codeQuizPage() {
+      const q = quiz.pool[quiz.idx];
+      if (!q) {
+        return `
+          ${topbar("练习", { back: "home", hideRight: true })}
+          <div class="page">
+            <div class="end-hero">
+              <h1>看完啦。</h1>
+              <div class="sub">编程题以理解为主<br>记得回头自己敲一遍</div>
+            </div>
+            <button class="cta" onclick="go('home')" style="margin-top:36px;">
+              <span>回首页</span><span class="arrow">→</span>
+            </button>
+          </div>`;
+      }
+      const chName = (DATA.meta.codeChapters.find(c => c.id === q.ch) || {}).name || "";
+      return `
+        ${topbar(`${q.ch.toUpperCase()} · ${chName}`, { back: "home", hideRight: true })}
+        <div class="page prog">
+          <div class="q-bar">
+            <span>${quiz.idx + 1} / ${quiz.pool.length}</span>
+            <div class="q-progress"><span style="width:${(quiz.idx + 1) / quiz.pool.length * 100}%"></span></div>
+            <button class="star-btn" data-star-id="${q.id}" aria-label="收藏" aria-pressed="${!!state.starred[q.id]}" onclick="toggleStar('${q.id}')">${state.starred[q.id] ? '★' : '☆'}</button>
+          </div>
+
+          <h2>${q.id} · ${q.title}</h2>
+          <div class="score ${q.score < 60 ? 'low' : ''}">原始得分 ${q.score} / 100</div>
+
+          <div class="row">
+            <div class="row-h">题目</div>
+            <div class="row-body">${q.problem}</div>
+          </div>
+          <div class="row">
+            <div class="row-h">我提交的代码</div>
+            <pre class="code">${escapeHTML(q.submitted)}</pre>
+          </div>
+          <div class="row">
+            <div class="row-h">错在哪</div>
+            <div class="row-body">${q.bug}</div>
+          </div>
+          <div class="row">
+            <div class="row-h">修正后</div>
+            <pre class="code">${escapeHTML(q.fixed)}</pre>
+          </div>
+          <div class="row">
+            <div class="row-h">考点</div>
+            <div class="row-body">${q.topic.join(" · ")}</div>
+          </div>
+
+          <div class="actions">
+            ${quiz.idx > 0 ? `<button class="btn" onclick="quiz.idx--; render();">上一题</button>` : ''}
+            <button class="btn btn-primary" onclick="quiz.idx++; render();">${quiz.idx + 1 >= quiz.pool.length ? '完成' : '下一题'}</button>
+          </div>
+        </div>`;
+    }
+
+    function setMistakeFilter(ch) { ui.mistakeFilter = ch; render(); }
+    function mistakesPage() {
+      const ids = getWrongIds();
+      const allItems = DATA.choice.filter(q => ids.includes(q.id));
+      // 章节聚合
+      const byCh = {};
+      for (const q of allItems) byCh[q.ch] = (byCh[q.ch] || 0) + 1;
+      const chips = ['all', ...Object.keys(byCh).sort()];
+      let filter = ui.mistakeFilter || 'all';
+      if (filter !== 'all' && !byCh[filter]) { filter = 'all'; ui.mistakeFilter = 'all'; }
+      const items = filter === 'all' ? allItems : allItems.filter(q => q.ch === filter);
+      return `
+        ${topbar("错题本", { back: "home", hideRight: true })}
+        <div class="page">
+          ${allItems.length === 0
+            ? `<div class="empty"><div class="icon">空</div><div class="lbl">还没有错题<br>去刷几道试试</div></div>`
+            : `
+              <div class="mfilter">
+                ${chips.map(c => {
+                  const lbl = c === 'all' ? `全部 ${allItems.length}` : `${c.toUpperCase()} ${byCh[c]}`;
+                  return `<button class="mfilter-chip ${filter===c?'on':''}" onclick="setMistakeFilter('${c}')">${lbl}</button>`;
+                }).join("")}
+              </div>
+              <div class="section-h"><div class="lbl">${items.length} 题</div><div class="count">复习 / AI 讲 / 已掌握</div></div>
+              <div class="mistake-list">${items.map(q => {
+                const p = state.progress[q.id] || {};
+                const wrongN = p.wrongCount || 1;
+                const isBoss = wrongN >= 3;
+                const chName = (DATA.meta.choiceChapters.find(c => c.id === q.ch) || {}).name || "";
+                const starred = !!state.starred[q.id];
+                return `<div class="mistake ${isBoss ? 'is-boss' : ''}" aria-label="错题:${stripHTML(q.stem).slice(0,40)}">
+                  <div class="head">
+                    <span class="ch">${q.ch.toUpperCase()} · ${chName}</span>
+                    <span style="display:flex; align-items:center; gap:8px;">
+                      ${isBoss
+                        ? `<span class="boss-flag">顽疾 · 错 ${wrongN} 次</span>`
+                        : `<span class="times">错 ${wrongN} 次</span>`}
+                      <button class="star-btn" data-star-id="${q.id}" aria-label="收藏" aria-pressed="${starred}" onclick="toggleStar('${q.id}')" style="font-size:18px; padding:0 4px;">${starred ? '★' : '☆'}</button>
+                    </span>
+                  </div>
+                  <div class="stem">${stripHTML(q.stem)}</div>
+                  <div class="mistake-actions">
+                    <button class="ma" onclick="reviewOne('${q.id}')">再做一次</button>
+                    <button class="ma primary" onclick="openAIMenu('${q.id}')">让 AI 讲</button>
+                    <button class="ma ok" onclick="markMastered('${q.id}')">✓ 掌握</button>
+                  </div>
+                </div>`;
+              }).join("")}</div>`}
+        </div>
+        ${bottomNav('mistakes')}`;
+    }
+
+    function reviewOne(qid) {
+      const q = DATA.choice.find(x => x.id === qid);
+      if (!q) return;
+      quiz.type = "wrong";
+      quiz.pool = [q];
+      quiz.idx = 0;
+      quiz.selected = null;
+      quiz.submitted = false;
+      go('q');
+    }
+
+    function settingsPage() {
+      const dark = state.theme === "dark";
+      const starN = getStarredIds().length;
+      const wrongN = getWrongIds().length;
+      const masteredN = Object.values(state.progress).filter(p => p && p.mastered).length;
+      return `
+        ${topbar("设置", { back: "home", hideRight: true })}
+        <div class="page">
+          <div class="setting-list">
+            <div class="setting-row">
+              <div>
+                <div>夜间模式</div>
+                <div class="lbl-2">护眼,看代码更舒服</div>
+              </div>
+              <button class="toggle ${dark ? 'on' : ''}" role="switch" aria-checked="${dark}" aria-label="夜间模式" onclick="setTheme('${dark ? 'light' : 'dark'}')"></button>
+            </div>
+            <div class="setting-row" onclick="exportData()" style="cursor:pointer;">
+              <div>
+                <div>导出数据</div>
+                <div class="lbl-2">错题 ${wrongN} · 收藏 ${starN} · 已掌握 ${masteredN}</div>
+              </div>
+              <span style="color:var(--text-3); font-family: var(--font-serif); font-size:20px;">↓</span>
+            </div>
+            <div class="setting-row" onclick="pickImportFile()" style="cursor:pointer;">
+              <div>
+                <div>导入数据</div>
+                <div class="lbl-2">从备份合并(不覆盖现有进度)</div>
+              </div>
+              <span style="color:var(--text-3); font-family: var(--font-serif); font-size:20px;">↑</span>
+            </div>
+            <div class="setting-row" onclick="openAbout()" style="cursor:pointer;">
+              <div>
+                <div>关于我们</div>
+                <div class="lbl-2">为什么叫 G2G</div>
+              </div>
+              <span style="color:var(--text-3); font-family: var(--font-serif); font-size:20px;">›</span>
+            </div>
+            <div class="setting-row" onclick="resetProgress()" style="cursor:pointer;">
+              <div>
+                <div style="color:var(--wrong)">清空所有进度</div>
+                <div class="lbl-2">错题本、收藏与统计全部清空</div>
+              </div>
+              <span style="color:var(--text-3); font-family: var(--font-serif); font-size:20px;">›</span>
+            </div>
+          </div>
+        </div>
+        ${bottomNav('settings')}`;
+    }
+
+    function openAbout() {
+      const html = `
+        <div class="ai-menu-overlay" id="about-modal" onclick="if(event.target===this)closeAbout()" role="dialog" aria-modal="true">
+          <div class="ai-menu" style="padding-bottom: 24px;">
+            <div style="text-align: center; margin-bottom: 18px;">
+              <img src="assets/logo-256.png" alt="G2G" style="width: 80px; height: 80px;" />
+              <div style="font-family: var(--font-serif); font-size: 28px; font-weight: 800; letter-spacing: 0.08em; margin-top: 8px;">G2G</div>
+              <div style="font-size: 13px; color: var(--text-3); letter-spacing: 0.2em; margin-top: 4px; font-weight: 600;">挂2过 · 从挂到过</div>
+            </div>
+            <div style="font-size: 14px; line-height: 1.9; color: var(--text-2); padding: 0 4px;">
+              <p style="margin: 0 0 12px;">「挂」→ <b>2</b> → 「过」 —— 从挂科到过线,中间隔着一个数字 2。</p>
+              <p style="margin: 0 0 12px;">拼音 <i>guà 2 guò</i>,首尾 G 开头,所以简称 <b>G2G</b>(也是 <i>Good to Go</i> 的双关)。</p>
+              <p style="margin: 0 0 12px; color: var(--text-3);">一个班的同学考前一周的共同记忆。</p>
+            </div>
+            <div style="text-align: center; margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-3); line-height: 1.8;">
+              界面由 <b>${CONFIG.aiModel}</b> 生成<br>
+              <a href="${CONFIG.github}" target="_blank" rel="noopener" style="color: var(--text-2); text-decoration: none; border-bottom: 1px dotted var(--border-strong);">GitHub 开源仓库 →</a>
+            </div>
+            <button class="ma" style="width:100%; margin-top:16px; padding:12px;" onclick="closeAbout()">关闭</button>
+          </div>
+        </div>`;
+      document.body.insertAdjacentHTML('beforeend', html);
+    }
+    function closeAbout() {
+      const el = document.getElementById('about-modal');
+      if (el) el.remove();
+    }
+
+    function resetProgress() {
+      if (!confirm("确认清空所有进度?此操作不可恢复。")) return;
+      localStorage.removeItem("progress");
+      localStorage.removeItem("today");
+      localStorage.removeItem("starred");
+      state.progress = {};
+      state.todayCount = {};
+      state.starred = {};
+      toast("已清空");
+      go('home');
+    }
+
+    /* =================================================================
+       MOCK TEST  ─── 30 题随机抽取 + 60 分钟倒计时
+       ================================================================= */
+    let _mockInt = null;
+    function startMockTicking() {
+      if (_mockInt) return;
+      _mockInt = setInterval(() => {
+        const left = Math.max(0, mock.endAt - Date.now());
+        const el = document.getElementById('mock-timer');
+        if (!el) return;
+        const m = Math.floor(left / 60000), s = Math.floor(left / 1000) % 60;
+        el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        el.classList.toggle('warn', left < 10 * 60000 && left > 60000);
+        el.classList.toggle('danger', left <= 60000);
+        if (left <= 0) { stopMockTicking(); toast("时间到,已自动交卷"); finishMock(); }
+      }, 1000);
+    }
+    function stopMockTicking() { if (_mockInt) { clearInterval(_mockInt); _mockInt = null; } }
+    function beginMock() {
+      const pool = shuffle(DATA.choice).slice(0, 30);
+      mock.active = true;
+      mock.pool = pool;
+      mock.idx = 0;
+      mock.answers = new Array(pool.length).fill(null);
+      mock.startAt = Date.now();
+      mock.endAt = mock.startAt + 60 * 60 * 1000;
+      mock.finished = false;
+      mock._added = false;
+      render();
+    }
+    function quitMock() {
+      if (mock.active && !mock.finished && !confirm("退出会丢失本次测试进度,确定?")) return;
+      stopMockTicking();
+      mock.active = false;
+      go('home');
+    }
+    function mockPick(i) {
+      mock.answers[mock.idx] = i;
+      const opts = document.querySelectorAll('.options .opt');
+      opts.forEach((el, idx) => {
+        el.classList.toggle('selected', idx === i);
+        el.setAttribute('aria-checked', idx === i ? 'true' : 'false');
+      });
+    }
+    function mockNext() {
+      if (mock.idx + 1 >= mock.pool.length) finishMock();
+      else { mock.idx++; render(); }
+    }
+    function mockPrev() { if (mock.idx > 0) { mock.idx--; render(); } }
+    function mockJump(i) { mock.idx = i; render(); }
+    function finishMock() {
+      stopMockTicking();
+      mock.finished = true;
+      go('mockResult');
+    }
+    function mockAddWrongsToBook() {
+      if (mock._added) { toast("已加过了"); return; }
+      mock._added = true;
+      let n = 0;
+      mock.pool.forEach((q, i) => {
+        const ans = mock.answers[i];
+        if (ans !== null && ans !== q.answer) {
+          const p = state.progress[q.id] || { answered: false, correctCount: 0, wrongCount: 0, lastWrong: false };
+          p.answered = true;
+          p.wrongCount = (p.wrongCount || 0) + 1;
+          p.lastWrong = true;
+          state.progress[q.id] = p;
+          n++;
+        }
+      });
+      save();
+      toast(`已加入错题本 · ${n} 题`);
+    }
+    function mockPage() {
+      if (!mock.active) {
+        return `
+          ${topbar("模拟测试", { back: "home", hideRight: true })}
+          <div class="page" style="padding-top: 40px;">
+            <div class="mock-result-card" style="text-align:center;">
+              <div style="font-family:var(--font-serif); font-size:28px; font-weight:800; margin-bottom:12px;">30 题 · 60 分钟</div>
+              <div class="sub" style="margin-bottom:24px; line-height:1.7;">从全部 ${DATA.choice.length} 道选择题中随机抽 30 题。<br>答题时不显示对错,完成后看总分与错题分布。</div>
+              <button class="cta" onclick="beginMock()"><span>开始</span><span class="arrow">→</span></button>
+            </div>
+            <div style="font-size:12px; color:var(--text-3); text-align:center; line-height:1.7; margin-top:18px;">中途退出会丢失进度,请预留 60 分钟。</div>
+          </div>
+        `;
+      }
+      const q = mock.pool[mock.idx];
+      const sel = mock.answers[mock.idx];
+      const optionHTML = q.options.map((opt, i) => {
+        const cls = sel === i ? 'opt selected' : 'opt';
+        return `<button class="${cls}" role="radio" aria-checked="${sel===i}" onclick="mockPick(${i})">
+          <span class="letter" aria-hidden="true">${String.fromCharCode(65+i)}</span>
+          <span class="text">${opt}</span>
+        </button>`;
+      }).join("");
+      const answered = mock.answers.filter(a => a !== null).length;
+      return `
+        ${topbar("模拟测试", { hideRight: true })}
+        <div class="page">
+          <div class="mock-bar">
+            <span>已答 ${answered} / ${mock.pool.length}</span>
+            <span class="timer" id="mock-timer">--:--</span>
+            <button class="ma" onclick="quitMock()" style="padding:4px 10px; font-size:12px;">退出</button>
+          </div>
+          <div class="q-bar">
+            <span>${mock.idx + 1} / ${mock.pool.length}</span>
+            <div class="q-progress"><span style="width:${(mock.idx+1)/mock.pool.length*100}%"></span></div>
+          </div>
+          <div class="q-stem">${q.stem}</div>
+          <div class="options" role="radiogroup" aria-label="选项">${optionHTML}</div>
+          <div class="actions" style="display:flex; gap:10px; margin-top:24px;">
+            <button class="btn" onclick="mockPrev()" ${mock.idx===0?'disabled':''} style="flex:1;">上一题</button>
+            <button class="btn btn-primary" onclick="mockNext()" style="flex:1;">${mock.idx+1>=mock.pool.length?'提交':'下一题'}</button>
+          </div>
+          <div style="margin-top:18px; display:flex; flex-wrap:wrap; gap:6px;">
+            ${mock.pool.map((_, i) => {
+              const done = mock.answers[i] !== null;
+              const cur = i === mock.idx;
+              const bg = cur ? 'var(--text)' : (done ? 'var(--accent-soft)' : 'var(--surface)');
+              const cl = cur ? 'var(--bg)' : 'var(--text-2)';
+              return `<button onclick="mockJump(${i})" style="width:32px; height:32px; border:1px solid var(--border); background:${bg}; color:${cl}; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">${i+1}</button>`;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+    function mockResultPage() {
+      const correct = mock.pool.filter((q, i) => mock.answers[i] === q.answer).length;
+      const total = mock.pool.length;
+      const pct = Math.round(correct / total * 100);
+      const wrongs = mock.pool.map((q, i) => ({ q, i, ans: mock.answers[i] })).filter(x => x.ans !== x.q.answer);
+      // 按章节统计错题
+      const byCh = {};
+      wrongs.forEach(({ q }) => { byCh[q.ch] = (byCh[q.ch] || 0) + 1; });
+      const grade = pct >= 80 ? 'good' : (pct >= 60 ? 'warn' : 'danger');
+      const usedMin = Math.floor((Date.now() - mock.startAt) / 60000);
+      return `
+        ${topbar("测试结果", { back: "home", hideRight: true })}
+        <div class="page">
+          <div class="mock-result-card">
+            <div class="score-big ${grade}">${pct}<span style="font-size:24px; color:var(--text-3); font-weight:600;"> 分</span></div>
+            <div class="sub">${correct} / ${total} 正确 · 用时 ${usedMin} 分钟</div>
+          </div>
+          ${Object.keys(byCh).length ? `
+            <div class="section-h"><div class="lbl">错题章节分布</div><div class="count">${wrongs.length} 题</div></div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+              ${Object.entries(byCh).sort((a,b)=>b[1]-a[1]).map(([ch, n]) => {
+                const name = (DATA.meta.choiceChapters.find(c=>c.id===ch)||{}).name || '';
+                return `<span class="pchip" style="cursor:default;">${ch.toUpperCase()} · ${name} · ${n}</span>`;
+              }).join("")}
+            </div>
+          ` : '<div class="empty" style="padding:30px;"><div class="lbl">全对!</div></div>'}
+          <button class="cta" onclick="mockAddWrongsToBook(); render();" ${wrongs.length?'':'disabled'} style="margin-bottom:10px;"><span>把错题加进错题本</span><span class="arrow">↗</span></button>
+          <button class="btn" onclick="beginMock()" style="width:100%; padding:14px;">再来一次</button>
+        </div>
+      `;
+    }
+
+    /* =================================================================
+       SEARCH
+       ================================================================= */
+    function onSearchInput(v) {
+      search.query = v.trim();
+      const out = document.getElementById('search-results');
+      if (!out) return;
+      out.innerHTML = renderSearchResults();
+    }
+    function renderSearchResults() {
+      const q = search.query;
+      if (!q) return '<div class="search-empty">输入关键词,实时搜全部题目</div>';
+      const lower = q.toLowerCase();
+      const hits = [];
+      for (const it of DATA.choice) {
+        if (stripHTML(it.stem).toLowerCase().includes(lower) ||
+            it.options.some(o => o.toLowerCase().includes(lower))) {
+          hits.push({ kind: 'choice', it });
+        }
+        if (hits.length >= 50) break;
+      }
+      for (const it of DATA.code) {
+        if (it.title.toLowerCase().includes(lower) || it.problem.toLowerCase().includes(lower)) {
+          hits.push({ kind: 'code', it });
+        }
+        if (hits.length >= 50) break;
+      }
+      if (!hits.length) return `<div class="search-empty">没找到「${escapeHTML(q)}」</div>`;
+      return hits.map(({ kind, it }) => {
+        const stem = kind === 'choice' ? stripHTML(it.stem) : `${it.id} · ${it.title} — ${stripHTML(it.problem)}`;
+        const cls = kind === 'choice' ? 'choice' : 'code';
+        return `<button class="search-result" onclick="openSearchHit('${kind}','${it.id}')">
+          <div class="meta">${it.ch.toUpperCase()} · ${kind === 'choice' ? '选择题' : '编程题'}</div>
+          <div class="stem">${stem}</div>
+        </button>`;
+      }).join("");
+    }
+    function openSearchHit(kind, qid) {
+      if (kind === 'choice') {
+        const q = DATA.choice.find(x => x.id === qid);
+        if (!q) return;
+        quiz.type = "search"; quiz.pool = [q]; quiz.idx = 0;
+        quiz.selected = null; quiz.submitted = false;
+        go('q');
+      } else {
+        const q = DATA.code.find(x => x.id === qid);
+        if (!q) return;
+        quiz.type = "code"; quiz.pool = [q]; quiz.idx = 0;
+        go('codeq');
+      }
+    }
+    function searchPage() {
+      return `
+        ${topbar("搜索题目", { back: "home", hideRight: true })}
+        <div class="page">
+          <input type="text" id="search-input" class="search-box" placeholder="输入关键词……" value="${escapeHTML(search.query||'')}" oninput="onSearchInput(this.value)" autocomplete="off" />
+          <div id="search-results">${renderSearchResults()}</div>
+        </div>
+      `;
+    }
+
+    /* =================================================================
+       AI PROMPT MENU
+       ================================================================= */
+    function openAIMenu(qid) {
+      ui.aiTargetId = qid;
+      const html = `
+        <div class="ai-menu-overlay" id="ai-menu" onclick="if(event.target===this)closeAIMenu()" role="dialog" aria-modal="true">
+          <div class="ai-menu">
+            <div class="ai-title">让 AI 怎么讲</div>
+            <button class="ai-opt" onclick="copyAIPromptVariant('general')"><div class="ai-main">通用讲解</div><div class="ai-desc">为什么对 · 其他错 · 易错点</div></button>
+            <button class="ai-opt" onclick="copyAIPromptVariant('counter')"><div class="ai-main">举反例</div><div class="ai-desc">用反例说清错误选项的陷阱</div></button>
+            <button class="ai-opt" onclick="copyAIPromptVariant('compare')"><div class="ai-main">对比类似题</div><div class="ai-desc">关联易混淆的同类知识点</div></button>
+            <button class="ai-opt" onclick="copyAIPromptVariant('brief')"><div class="ai-main">5 句话说清</div><div class="ai-desc">极简模式,只要骨干</div></button>
+            <button class="ma" style="width:100%; margin-top:8px; padding:12px;" onclick="closeAIMenu()">取消</button>
+          </div>
+        </div>`;
+      document.body.insertAdjacentHTML('beforeend', html);
+    }
+    function closeAIMenu() {
+      const el = document.getElementById('ai-menu');
+      if (el) el.remove();
+    }
+    function copyAIPromptVariant(variant) {
+      const qid = ui.aiTargetId;
+      closeAIMenu();
+      copyAIPrompt(qid, variant);
+    }
+
+    /* =================================================================
+       EXPORT / IMPORT
+       ================================================================= */
+    function exportData() {
+      const blob = new Blob([JSON.stringify({
+        v: 1, exportedAt: new Date().toISOString(),
+        progress: state.progress, todayCount: state.todayCount, starred: state.starred,
+      }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `g2g-backup-${makeTodayKey()}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast("已导出 JSON");
+    }
+    function importDataFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.progress) {
+            for (const [qid, ip] of Object.entries(data.progress)) {
+              const cur = state.progress[qid] || { answered: false, correctCount: 0, wrongCount: 0, lastWrong: false };
+              state.progress[qid] = {
+                answered: !!(cur.answered || ip.answered),
+                correctCount: Math.max(cur.correctCount || 0, ip.correctCount || 0),
+                wrongCount: Math.max(cur.wrongCount || 0, ip.wrongCount || 0),
+                lastWrong: !!(cur.lastWrong || ip.lastWrong),
+                mastered: !!(cur.mastered || ip.mastered),
+              };
+            }
+          }
+          if (data.todayCount) {
+            for (const [k, t] of Object.entries(data.todayCount)) {
+              const cur = state.todayCount[k] || { answered: 0, correct: 0 };
+              state.todayCount[k] = {
+                answered: Math.max(cur.answered || 0, t.answered || 0),
+                correct: Math.max(cur.correct || 0, t.correct || 0),
+              };
+            }
+          }
+          if (data.starred) {
+            if (Array.isArray(data.starred)) {
+              for (const id of data.starred) state.starred[id] = true;
+            } else {
+              for (const id of Object.keys(data.starred)) {
+                if (data.starred[id]) state.starred[id] = true;
+              }
+            }
+          }
+          save();
+          toast("已导入,取较大值合并");
+          render();
+        } catch (err) { toast("导入失败:" + err.message); }
+      };
+      reader.readAsText(file);
+    }
+    function pickImportFile() {
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = '.json,application/json';
+      inp.onchange = e => { const f = e.target.files[0]; if (f) importDataFile(f); };
+      inp.click();
+    }
+
+    /* =================================================================
+       ROUTER
+       ================================================================= */
+    function render() {
+      const app = document.getElementById("app");
+      // welcome 路由不依赖 DATA;其他路由必须 DATA 就绪
+      if (state.route !== "welcome" && !DATA) return;
+      if (!state.agreed && state.route !== "welcome") state.route = "welcome";
+
+      let html;
+      switch (state.route) {
+        case "welcome":  html = welcomePage(); break;
+        case "q":        html = quizPage(); break;
+        case "codeq":    html = codeQuizPage(); break;
+        case "mistakes": html = mistakesPage(); break;
+        case "settings": html = settingsPage(); break;
+        case "mock":     html = mockPage(); break;
+        case "mockResult": html = mockResultPage(); break;
+        case "search":   html = searchPage(); break;
+        default:         html = homePage();
+      }
+      app.innerHTML = html;
+      tickTimers();
+      if (state.route === 'home') { startTicking(); animateMountFx(); }
+      else if (state.route === 'mock' && mock.active) startMockTicking();
+      else stopTicking();
+      if (state.route === 'search') {
+        const inp = document.getElementById('search-input');
+        if (inp) inp.focus();
+      }
+    }
+
+    /* INIT */
+    document.documentElement.setAttribute("data-theme", state.theme);
+    Object.assign(window, {
+      go, agreeAndEnter, startQuiz, pickOpt, submitQ, nextQ,
+      copyAIPrompt, reviewOne, setTheme, resetProgress, loadData,
+      showPicker, closePicker, applyPicker, setPickerOpt,
+      toggleStar, markMastered, setMistakeFilter,
+      beginMock, quitMock, mockPick, mockNext, mockPrev, mockJump, mockAddWrongsToBook,
+      onSearchInput, openSearchHit,
+      openAIMenu, closeAIMenu, copyAIPromptVariant,
+      exportData, pickImportFile,
+      openAbout, closeAbout,
+    });
+    // 骨架屏:logo + 标题 + 三宫格占位,避免冷启动白屏
+    document.getElementById('app').innerHTML = `
+      <div class="skeleton" aria-busy="true" aria-label="加载中">
+        <img src="assets/logo-256.png" alt="" class="sk-logo" />
+        <div class="sk-title">G2G</div>
+        <div class="sk-sub">挂2过 · 从挂到过</div>
+        <div class="sk-stats">
+          <div class="sk-card"></div>
+          <div class="sk-card"></div>
+          <div class="sk-card"></div>
+        </div>
+      </div>
+    `;
+    loadData();
+  </script>
+</body>
+</html>

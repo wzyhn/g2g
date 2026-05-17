@@ -1,0 +1,35 @@
+# 中间产物
+data/parts/
+data/parts/in/
+data/parts/out/
+data/parts/review/
+data/parts/review_in/
+data/parts/code_review/
+data/parts/rewrite_in.json
+data/parts/rewrite_out.json
+
+# 审核/调试输出
+review-report.md
+code-review-summary.md
+bug-report.md
+
+# 原始大图(已压缩到 assets/)
+logo.png
+
+# 旧方案备份
+plan/
+
+# 本地启动脚本
+start.bat
+
+# 源题库(版权风险,不公开)
+../review/
+review/
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+.vscode/
+.idea/
