@@ -10,15 +10,18 @@
   <meta name="googlebot" content="noindex, nofollow">
   <meta name="baiduspider" content="noindex, nofollow">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://wzyhn.github.io/g2g/">
   <meta property="og:title" content="G2G 挂2过">
   <meta property="og:description" content="Python 期末冲刺 · 选择题 + 编程题题库 · AI 讲解">
-  <meta property="og:image" content="assets/favicon-180.png">
+  <meta property="og:image" content="https://wzyhn.github.io/g2g/assets/favicon-180.png">
+  <meta property="og:image:width" content="180">
+  <meta property="og:image:height" content="180">
   <meta property="og:locale" content="zh_CN">
   <meta property="og:site_name" content="G2G 挂2过">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="G2G 挂2过">
   <meta name="twitter:description" content="Python 期末冲刺 · AI 讲解题库">
-  <meta name="twitter:image" content="assets/favicon-180.png">
+  <meta name="twitter:image" content="https://wzyhn.github.io/g2g/assets/favicon-180.png">
   <title>G2G 挂2过</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
@@ -635,6 +638,11 @@
     .pchip { font-size: 13px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--text-2); cursor: pointer; font-weight: 600; letter-spacing: 0.02em; }
     .pchip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
     .picker-go { margin-top: 8px; }
+    .ppv { max-height: 168px; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; }
+    .ppv-item { display: flex; gap: 10px; padding: 6px 0; font-size: 13px; line-height: 1.5; border-bottom: 1px dashed var(--border); }
+    .ppv-item:last-child { border-bottom: none; }
+    .ppv-i { color: var(--text-3); font-weight: 700; flex-shrink: 0; min-width: 18px; font-variant-numeric: tabular-nums; }
+    .ppv-s { color: var(--text-2); flex: 1; }
 
     /* 模拟测试 */
     .mock-bar {
@@ -970,6 +978,9 @@
     const ICON_BACK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg>`;
 
     function topbar(title, opts = {}) {
+      let right = `<span class="topbar-spacer"></span>`;
+      if (opts.reopen) right = `<button class="icon-btn" onclick="reopenPicker()" aria-label="换题" title="重选" style="font-size:22px; line-height:1;">↺</button>`;
+      else if (!opts.hideRight) right = `<button class="icon-btn" onclick="go('settings')" aria-label="设置">${ICON_SETTINGS}</button>`;
       return `
         <div class="topbar">
           ${opts.back
@@ -979,10 +990,19 @@
             <img class="topbar-logo" src="assets/logo-48.png" alt="G2G" />
             <span>${title}</span>
           </div>
-          ${opts.hideRight
-            ? `<span class="topbar-spacer"></span>`
-            : `<button class="icon-btn" onclick="go('settings')" aria-label="设置">${ICON_SETTINGS}</button>`}
+          ${right}
         </div>`;
+    }
+    function reopenPicker() {
+      const t = quiz.type;
+      if (t === 'search') { go('search'); return; }
+      if (!(t === 'choice' || t === 'code' || t === 'wrong' || t === 'starred')) {
+        toast("这一池没有选题面板");
+        return;
+      }
+      const dirty = quiz.idx > 0 || quiz.selected !== null || quiz.submitted;
+      if (dirty && !confirm(`换题会丢失当前 ${quiz.idx + 1}/${quiz.pool.length} 进度,确定?`)) return;
+      showPicker(t, quiz.ch);
     }
     function bottomNav(active) {
       const item = (key, ico, label) => `
@@ -1048,7 +1068,7 @@
             <div class="stat"><div class="num" data-target="${rate}">0<span style="font-size:14px; color:var(--text-3);">%</span></div><div class="lbl">正确率</div></div>
           </div>
 
-          <button class="cta" onclick="${wrongCount ? "startQuiz('wrong')" : ''}" ${wrongCount ? '' : 'disabled'}>
+          <button class="cta" onclick="${wrongCount ? "showPicker('wrong')" : ''}" ${wrongCount ? '' : 'disabled'}>
             <span>${wrongCount ? `刷错题 · ${wrongCount} 题` : '还没有错题'}</span>
             <span class="arrow">→</span>
           </button>
@@ -1057,7 +1077,7 @@
             const starN = getStarredIds().length;
             return `
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
-                <button class="btn" onclick="${starN ? "startQuiz('starred')" : ''}" ${starN ? '' : 'disabled'} style="padding:14px; font-weight:700;">⭐ 收藏 ${starN}</button>
+                <button class="btn" onclick="${starN ? "showPicker('starred')" : ''}" ${starN ? '' : 'disabled'} style="padding:14px; font-weight:700;">⭐ 收藏 ${starN}</button>
                 <button class="btn" onclick="go('mock')" style="padding:14px; font-weight:700;">模拟测试 30 题</button>
               </div>
               <button class="btn" onclick="go('search')" style="margin-top: 10px; padding: 12px; width: 100%; font-weight: 600;">🔍 搜索题目</button>
@@ -1116,6 +1136,7 @@
       picker.count = 'all';
       picker.order = 'seq';
       picker.skipMastered = false;
+      picker.wrongCh = 'all';
       renderPickerOverlay();
     }
     function closePicker() {
@@ -1133,27 +1154,85 @@
       picker[key] = val;
       renderPickerOverlay();
     }
+    function pickerResolvePool() {
+      const t = picker.type;
+      if (t === "choice") return DATA.choice.filter(q => q.ch === picker.ch);
+      if (t === "code")   return DATA.code.filter(q => q.ch === picker.ch);
+      if (t === "wrong") {
+        const ids = getWrongIds();
+        let arr = DATA.choice.filter(q => ids.includes(q.id));
+        if (picker.wrongCh && picker.wrongCh !== 'all') arr = arr.filter(q => q.ch === picker.wrongCh);
+        return arr;
+      }
+      if (t === "starred") {
+        const ids = getStarredIds();
+        return DATA.choice.filter(q => ids.includes(q.id))
+          .concat(DATA.code.filter(q => ids.includes(q.id)));
+      }
+      return [];
+    }
+    function getWrongRawForPicker() {
+      const ids = getWrongIds();
+      return DATA.choice.filter(q => ids.includes(q.id));
+    }
+    function pickerTitle() {
+      const t = picker.type;
+      if (t === "choice" || t === "code") {
+        const list = t === "choice" ? DATA.meta.choiceChapters : DATA.meta.codeChapters;
+        const m = list.find(c => c.id === picker.ch) || {};
+        return `${(m.id || '').toUpperCase()} · ${m.name || ''}`;
+      }
+      if (t === "wrong")   return "刷错题";
+      if (t === "starred") return "⭐ 收藏";
+      return "选题";
+    }
     function pickerHTML() {
-      const list = picker.type === "choice" ? DATA.choice : (picker.type === "code" ? DATA.code : []);
-      const chMeta = picker.type === "choice"
-        ? (DATA.meta.choiceChapters.find(c => c.id === picker.ch) || {})
-        : (DATA.meta.codeChapters.find(c => c.id === picker.ch) || {});
-      const all = list.filter(q => q.ch === picker.ch);
-      const done = all.filter(q => state.progress[q.id]?.answered).length;
-      const wrong = all.filter(q => state.progress[q.id]?.lastWrong).length;
-      const mastered = all.filter(q => isMastered(q.id)).length;
+      const all0 = pickerResolvePool();
+      const done = all0.filter(q => state.progress[q.id]?.answered).length;
+      const wrong = all0.filter(q => state.progress[q.id]?.lastWrong).length;
+      const mastered = all0.filter(q => isMastered(q.id)).length;
+      const effective = picker.skipMastered ? all0.filter(q => !isMastered(q.id)) : all0;
+      const total0 = all0.length;
+      const total = effective.length;
       const chip = (key, val, label) =>
         `<button class="pchip ${picker[key]===val?'on':''}" onclick="setPickerOpt('${key}','${val}')">${label}</button>`;
-      const isCode = picker.type === 'code';
+      const hideCount = picker.type === 'code' || total <= 10;
+      const previewStems = effective.slice(0, 5).map((q, i) => {
+        const s = stripHTML(q.stem || (q.title ? `${q.id} ${q.title}` : '')).slice(0, 56);
+        return `<div class="ppv-item"><span class="ppv-i">${i+1}</span><span class="ppv-s">${s}${s.length>=56?'…':''}</span></div>`;
+      }).join("");
+      const noPool = total0 === 0;
+      const noEffective = total === 0 && total0 > 0;
+      const startN = picker.count==='all' ? total : Math.min(Number(picker.count)||total, total);
+      // 错题 picker:章节筛选 chips
+      let wrongChips = '';
+      if (picker.type === 'wrong') {
+        const raw = getWrongRawForPicker();
+        const byCh = {};
+        raw.forEach(q => byCh[q.ch] = (byCh[q.ch]||0)+1);
+        const chKeys = ['all', ...Object.keys(byCh).sort()];
+        wrongChips = `
+          <div class="picker-row"><div class="prl">范围</div>
+            <div class="pchips">
+              ${chKeys.map(c => {
+                const lbl = c==='all' ? `全部 ${raw.length}` : `${c.toUpperCase()} ${byCh[c]}`;
+                const on = (picker.wrongCh||'all') === c;
+                return `<button class="pchip ${on?'on':''}" onclick="setPickerOpt('wrongCh','${c}')">${lbl}</button>`;
+              }).join("")}
+            </div>
+          </div>`;
+      }
       return `
         <div class="picker-overlay" id="picker-overlay" onclick="if(event.target===this)closePicker()" role="dialog" aria-modal="true" aria-label="选题">
           <div class="picker">
             <div class="picker-head">
-              <div class="pt">${chMeta.id ? chMeta.id.toUpperCase() : ''} · ${chMeta.name || ''}</div>
+              <div class="pt">${pickerTitle()}</div>
               <button class="picker-x" onclick="closePicker()" aria-label="关闭">×</button>
             </div>
-            <div class="picker-stat">共 ${all.length} 题 · 已练 ${done} · 错过 ${wrong} · 已掌握 ${mastered}</div>
-            ${isCode ? '' : `
+            <div class="picker-stat">共 ${total0} 题 · 已练 ${done} · 错过 ${wrong} · 已掌握 ${mastered}</div>
+            ${noPool ? `<div class="empty" style="padding:30px 0;"><div class="lbl">这一组没有题</div></div>` : `
+            ${wrongChips}
+            ${hideCount ? '' : `
             <div class="picker-row"><div class="prl">题数</div>
               <div class="pchips">${chip('count','10','10')}${chip('count','20','20')}${chip('count','30','30')}${chip('count','all','全部')}</div>
             </div>`}
@@ -1170,7 +1249,11 @@
                 <button class="pchip ${picker.skipMastered?'on':''}" onclick="setPickerOpt('skipMastered',${!picker.skipMastered})">跳过已掌握</button>
               </div>
             </div>
-            <button class="cta picker-go" onclick="applyPicker()"><span>开始</span><span class="arrow">→</span></button>
+            ${noEffective ? '' : `<div class="picker-row"><div class="prl">题面预览(前 ${Math.min(5, total)} 题)</div>
+              <div class="ppv">${previewStems}</div>
+            </div>`}
+            <button class="cta picker-go" onclick="applyPicker()" ${startN===0?'disabled':''}><span>${startN===0?'这一组没有可练的':`开始 · ${startN} 题`}</span><span class="arrow">→</span></button>
+            `}
           </div>
         </div>`;
     }
@@ -1267,7 +1350,7 @@
       const title = isWrong ? "刷错题" : `${q.ch.toUpperCase()} · ${chName}`;
 
       return `
-        ${topbar(title, { back: "home", hideRight: true })}
+        ${topbar(title, { back: "home", reopen: true })}
         <div class="page">
           <div class="q-bar">
             <span>${quiz.idx + 1} / ${quiz.pool.length}</span>
@@ -1439,7 +1522,7 @@ ${q.options.map((o, i) => `${letters[i]}. ${stripHTML(o)}`).join("\n")}
       }
       const chName = (DATA.meta.codeChapters.find(c => c.id === q.ch) || {}).name || "";
       return `
-        ${topbar(`${q.ch.toUpperCase()} · ${chName}`, { back: "home", hideRight: true })}
+        ${topbar(`${q.ch.toUpperCase()} · ${chName}`, { back: "home", reopen: true })}
         <div class="page prog">
           <div class="q-bar">
             <span>${quiz.idx + 1} / ${quiz.pool.length}</span>
@@ -1577,6 +1660,13 @@ ${q.options.map((o, i) => `${letters[i]}. ${stripHTML(o)}`).join("\n")}
                 <div class="lbl-2">为什么叫 G2G</div>
               </div>
               <span style="color:var(--text-3); font-family: var(--font-serif); font-size:20px;">›</span>
+            </div>
+            <div class="setting-row" onclick="window.open('${CONFIG.github}','_blank','noopener,noreferrer')" style="cursor:pointer;">
+              <div>
+                <div>GitHub 仓库</div>
+                <div class="lbl-2">开源 · 欢迎 PR / Issue</div>
+              </div>
+              <span style="color:var(--text-3); font-family: var(--font-serif); font-size:20px;">↗</span>
             </div>
             <div class="setting-row" onclick="resetProgress()" style="cursor:pointer;">
               <div>
@@ -1836,7 +1926,7 @@ ${q.options.map((o, i) => `${letters[i]}. ${stripHTML(o)}`).join("\n")}
       } else {
         const q = DATA.code.find(x => x.id === qid);
         if (!q) return;
-        quiz.type = "code"; quiz.pool = [q]; quiz.idx = 0;
+        quiz.type = "code"; quiz.ch = q.ch; quiz.pool = [q]; quiz.idx = 0;
         go('codeq');
       }
     }
@@ -1987,6 +2077,7 @@ ${q.options.map((o, i) => `${letters[i]}. ${stripHTML(o)}`).join("\n")}
       openAIMenu, closeAIMenu, copyAIPromptVariant,
       exportData, pickImportFile,
       openAbout, closeAbout,
+      reopenPicker,
     });
     // 骨架屏:logo + 标题 + 三宫格占位,避免冷启动白屏
     document.getElementById('app').innerHTML = `

@@ -12,6 +12,9 @@ data/parts/rewrite_out.json
 review-report.md
 code-review-summary.md
 bug-report.md
+bug-report-*.md
+ux-report-*.md
+data-gh-report.md
 
 # 原始大图(已压缩到 assets/)
 logo.png
